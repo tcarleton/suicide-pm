@@ -111,7 +111,7 @@ ggplot() +
   
   labs(fill = "Average PM 2.5",
        title = "China's regional demographics",
-       subtitle = "County Average PM 2.5, 2013 ~ 2018") +
+       subtitle = "County Average PM 2.5, 2013 ~ 2017") +
   
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
@@ -151,7 +151,7 @@ ggplot() +
   
   labs(fill = "Average Air Quality Index",
        title = "China's regional demographics",
-       subtitle = "County Average Air Quality Index, 2013 ~ 2018") +
+       subtitle = "County Average Air Quality Index, 2013 ~ 2017") +
   
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
