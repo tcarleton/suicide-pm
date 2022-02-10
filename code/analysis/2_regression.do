@@ -263,7 +263,7 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
 *** cluster by county
 
 foreach V of varlist d24_rate fd24_rate md24_rate {
-	loc outfilester "results/ster/winsor_p`pp'_`V'_clCounty.ster"
+	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_clCounty.ster"
   ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code)
   estimates save "`outfilester'", replace
   outreg2 using "`outfile'", label tex(frag) ///

@@ -1,20 +1,30 @@
 **********************************************************************************
-* This script generates panel A of Figure 1 in Zhang et al. (2020)	     *
-* Regression results that are called are estimated in 3b_reg_robustness.do and 4_reg_spec_checks.do
-* Thanks to Burlig et al. (2020) for some nice plotting code inspiration! 
+
+* This script generates panel A of Figure 2 in Zhang et al.
+
+* Data called by this script are assembled in 2_regression.do and 
+* 3_heterogeneity.do. 
+
+**********************************************************************************
+
+**********************************************************************************				                                                         *
+* Set up *
 **********************************************************************************
 
 // wd
 cd ~
 	if regexm("`c(pwd)'","/Users/tammacarleton")==1 {
-	cd "~/Dropbox/suicide/main_2017"
-	global wd "~/Dropbox/suicide/main_2017"
-	global sterdir "$wd/results/ster"
+	global root "~/Dropbox/suicide"
+	global datadir "$root/main_2017"
+	global codedir "~/Dropbox/Works_in_progress/git_repos/suicide-pm"
+	global resdir "$codedir/results"
+	global sterdir "$codedir/results/ster"
+	cd $datadir
+	} 
+	else {
+	di "NEED TO CONFIGURE FILEPATH FOR THIS USER"
 	}
 
-**********************************************************************************
-* Set up                                                
-**********************************************************************************
 
 clear
  
@@ -26,17 +36,17 @@ set scheme plotplain
 	* robustness: FGLS, FE, clustering, weather controls
 */
 
-loc outcome = "d24_rate" // can make figure for men or women only if desired
+loc outcome = "d24_rate" // can make figure for men or women only if desired, using md24_rate or fd24_rate
 loc p = "p98" // amount of winsorization
 
 // robustness sets
 loc felist "cMwFE" "counTFE" "cYwFE" "provTFE"
-loc weatherlist "binWeather" "linWeather" "noWeather" "ERAIWeather"
+loc weatherlist "binWeather" "linWeather" "noWeather" 
 loc cluslist "clNone" "clCounty" "clWeek"
 loc instlist "TIIndD1" "TIStrD1"
 
 // total obs = number of combinations
-loc obs = 14
+loc obs = 13
 
 **********************************************************************************
 * Pull in all robustness results                                                
@@ -126,10 +136,10 @@ gen dummy = 0
 
 loc mycolor = "105 106 107" //"167 203 226"
 twoway /// 
-	(pci 0 `x_line_main_spec' 14 `x_line_main_spec', lcolor("`mycolor'") lwidth(thin) lp(shortdash)) /// line at main spec
+	(pci 0 `x_line_main_spec' 13 `x_line_main_spec', lcolor("`mycolor'") lwidth(thin) lp(shortdash)) /// line at main spec
 	(rspike ci95_lo ci95_hi row, horizontal color(gs10%40) yaxis(1)) ///
 	(rspike ci90_lo ci90_hi row, horizontal color("`mycolor'%80") yaxis(1)) ///
-	(pci 0 0 14 0, lcolor(black) lwidth(medthick)) /// line at 0
+	(pci 0 0 13 0, lcolor(black) lwidth(medthick)) /// line at 0
 	(scatter row beta if modelgroup == 1, mcolor("`mycolor'") yaxis(1) msymbol(circle) msize(medlarge)) /// 
 	(scatter row beta if modelgroup != 1, mcolor("`mycolor'") yaxis(1) msymbol(circle) mfcolor(white) msize(medlarge)) /// 
 	, ///
@@ -137,15 +147,14 @@ twoway ///
 	xtitle("Effect of PM2.5 on suicides per 10,000", size(medsmall)) /// 
 	xlabel(, nogrid) ///
 	ytitle("") ///
-	ylabel(14 "{bf:Main specification}" /// 	spec 1
-		13 "County x mo. FE" ///
-		12 "County trends" ///
-		11 "County x yr. FE" ///
-		10 "Prov. trends" ///
-		9 "Nonpar. weather" /// 	spec 2
-		8 "Linear weather" ///
-		7 "Weather omitted" /// 	spec 3
-		6 "ERAI weather" ///
+	ylabel(13 "{bf:Main specification}" /// 	spec 1
+		12 "County x mo. FE" ///
+		11 "County trends" ///
+		10 "County x yr. FE" ///
+		9 "Prov. trends" ///
+		8 "Nonpar. weather" /// 	spec 2
+		7 "Linear weather" ///
+		6 "Weather omitted" /// 	spec 3
 		5 "No clustering" ///
 		4 "County clusters" ///
 		3 "Week clusters" /// 	spec 5
@@ -155,6 +164,6 @@ twoway ///
 		angle(0) labsize(2.7) noticks ) 
 	
 	
-graph export "results/figures/Fig2/figure_2A.pdf", replace	
+graph export "$resdir/figures/figure_2A.pdf", replace	
 
 

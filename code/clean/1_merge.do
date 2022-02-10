@@ -18,8 +18,8 @@ set more off
 // wd
 cd ~
 	if regexm("`c(pwd)'","/Users/tammacarleton")==1 {
-	global root "~/Dropbox/suicide/main_2017"
-	global datadir "$root/main_2017/"
+	global root "~/Dropbox/suicide"
+	global datadir "$root/main_2017"
 	cd $root
 	} 
 	else {

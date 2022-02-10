@@ -1,24 +1,37 @@
- **********************************************************************************************************
-* Heterogeneity figure    *
-* Regression results that are called are estimated in 3b_reg_robustness.do and 3c_reg_heterogeneity.do
-**********************************************************************************************************
+ 
+ **********************************************************************************
 
+* This script generates panel C of Figure 2 in Zhang et al.
 
+* Data called by this script are assembled in 2_regression.do and 
+* 3_heterogeneity.do. 
+
+**********************************************************************************
+
+**********************************************************************************				                                                         *
+* Set up *
+**********************************************************************************
+
+// wd
 cd ~
 	if regexm("`c(pwd)'","/Users/tammacarleton")==1 {
-	cd "~/Dropbox/suicide/main_2017"
-	global wd "~/Dropbox/suicide/main_2017"
-	global sterdir "$wd/results/ster"
+	global root "~/Dropbox/suicide"
+	global datadir "$root/main_2017"
+	global codedir "~/Dropbox/Works_in_progress/git_repos/suicide-pm"
+	global resdir "$codedir/results"
+	global sterdir "$codedir/results/ster"
+	cd $datadir
+	} 
+	else {
+	di "NEED TO CONFIGURE FILEPATH FOR THIS USER"
 	}
-
-
-**********************************************************************************
-* Set up                                                
-**********************************************************************************
 
 clear
  
 set scheme plotplain
+
+loc outcome = "d24_rate" // can make figure for men or women only if desired
+loc p = "p98" // amount of winsorization
 
 /*
 // specs to show:
@@ -29,9 +42,6 @@ set scheme plotplain
 					iv) urban vs rural
 					v) rich vs poor
 */
-
-loc outcome = "d24_rate" 
-loc p = "p98" // amount of winsorization
 
 // heterogeneity sets
 *loc outcome_sex "md24_rate" "fd24_rate"
@@ -47,7 +57,6 @@ loc incomelist "rich" "poor"
 
 // total obs = number of combinations
 loc obs = 12
-
 
 
 **********************************************************************************
@@ -132,12 +141,6 @@ foreach income in "`incomelist'" {
 }
 
 
-
-
-**********************************************************************************
-* Pull in all robustness results                                                
-**********************************************************************************
-
 gsort -modelgroup
 gen row = _n
 
@@ -163,8 +166,6 @@ replace pos=row+2 if modelgroup==4
 replace pos=row+3 if modelgroup==3
 replace pos=row+4 if modelgroup==2
 replace pos=row+5 if modelgroup==1
-
-
 
 
 loc mycolor = "105 106 107" //"167 203 226"
@@ -211,4 +212,4 @@ twoway ///
 		angle(0) labsize(2.7) noticks nogrid) 
 	
 	
-graph export "results/figures/Fig2/figure_2C.pdf", replace	
+graph export "$resdir/figures/figure_2C.pdf", replace	

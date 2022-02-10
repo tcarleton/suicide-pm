@@ -99,6 +99,10 @@ pre-prs pre2-prs2
 
 keep if d24_rate !=. & pm25 !=. & TINumD1 !=. & tem_ave !=. & pre !=. & ssd !=. & win !=. & rhu !=. & prs !=. 
 
+* residualize
+reghdfe pm25 $control2, absorb(dsp_code week) cluster(dsp_code week)
+
+
 reghdfe pm25 TINumD1 $control2, absorb(dsp_code week) cluster(dsp_code week)
 
 loc mmin = 0
