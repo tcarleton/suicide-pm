@@ -36,6 +36,8 @@ loc test = "FALSE"
 * do you want to plot some example trends?
 loc plot = "FALSE"
 
+set scheme plotplain
+
 **********************************************************
 	* Estimate county-specific trends in pollution from 2013-2018
 	* Use trends to construct counterfactual time series of pollution
@@ -324,24 +326,23 @@ replace pos=10 if dsp_code== 440306
 replace pos=10 if dsp_code== 310116
 
 * label key cities
-gen dspname_Eng = "Baoan" if dsp_code==440306
+gen dspname_Eng = "Baoan" if dsp_code==440306 // missing
 replace dspname_Eng = "Guiping" if dsp_code==450881
-replace dspname_Eng = "Minhang" if dsp_code==310112
-replace dspname_Eng = "Jinshan" if dsp_code==310116
-replace dspname_Eng = "Dongguan" if dsp_code==441900
-replace dspname_Eng = "Pudong" if dsp_code==310115
-replace dspname_Eng = "Chaoyang" if dsp_code==110105
-replace dspname_Eng = "Haidian" if dsp_code==110108
-
-
+replace dspname_Eng = "Minhang" if dsp_code==310112 // missing
+replace dspname_Eng = "Jinshan" if dsp_code==310116 // missing
+replace dspname_Eng = "Dongguan" if dsp_code==441900 // missing
+replace dspname_Eng = "Pudong" if dsp_code==310115 // missing
+replace dspname_Eng = "Chaoyang" if dsp_code==110105 
+replace dspname_Eng = "Haidian" if dsp_code==110108 
+replace dspname_Eng = "Hannan" if dsp_code==420113  
 
 	
 count if lives_saved_tot!=.
 loc xmax = r(N)
 
-twoway (dropline lives_saved_tot rank if top_pop==1, mlabel(dspname_Eng) mlabv(pos) mlabsize(vsmall) msymbol(smdiamond) mcolor(gs8) msize(small) /// 
+twoway (dropline lives_saved_tot rank if top_pop==0, msymbol(smcircle) mcolor(gs8) msize(tiny) /// format of grey dots
 		lwidth(vthin) lpattern(solid) lcolor("236 133 95%80")) /// format of vertical lines/bars (area under graph)
-		(dropline lives_saved_tot rank if top_pop==0, msymbol(smcircle) mcolor(gs8) msize(tiny) /// format of grey dots
+		(dropline lives_saved_tot rank if top_pop==1, mlabel(dspname_Eng) mlabv(pos) mlabsize(vsmall) msymbol(diamond) mcolor(gs8) msize(medium) mlcolor(black) /// 
 		lwidth(vthin) lpattern(solid) lcolor("236 133 95%80")) /// format of vertical lines/bars (area under graph)
 		, ///
 		ytitle("Total avoided suicides per county: 2013-2017")  ///
