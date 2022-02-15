@@ -88,10 +88,11 @@ gen prd=(firstdigits==44)
 gen jingjinji= (firstdigits==11 | firstdigits==12 | firstdigits==13) 
 
 * Region
-gen region=.
-replace region=1 if yrd==1
-replace region=2 if prd==1
-replace region=3 if jingjinji==1
+gen regionma=.
+replace regionma=1 if yrd==1
+replace regionma=2 if prd==1
+replace regionma=3 if jingjinji==1
+replace regionma = 4 if beijing==1 
 
 ** since there are missings in the population data I'll use the average over the study period
 bysort dsp_code: egen av_pop_tot=mean(pop_tot)
@@ -101,8 +102,8 @@ drop if year==.
 tempfile countypop
 save "`countypop'", replace
 
-collapse (firstnm) av_pop_tot pop2015, by(dsp_code region)
-drop if region==.
+collapse (firstnm) av_pop_tot pop2015, by(dsp_code regionma)
+drop if regionma==.
 
 ** there are some counties in YRD that have missing population data in all years
 * use census data instead
@@ -110,34 +111,15 @@ drop if region==.
 replace av_pop_tot= pop2015 if av_pop_tot==.
 
 * now add the average population over 2013-2017 in each county by region
-collapse (sum) av_pop_tot, by(region)
+collapse (sum) av_pop_tot, by(regionma)
 
-
-tempfile regions
-save "`regions'", replace
-
-use "`countypop'", clear
-
-
-collapse (firstnm) av_pop_tot, by(dsp_code beijing)
-drop if beijing==0
-
-collapse (sum) av_pop_tot, by(beijing)
-
-gen region=4
-
-drop beijing
-
-append using "`regions'", generate(filenum)
-
-sort region 
+sort regionma
 
 label define regionlab 1 "YRD" 2 "PRD" 3 "Jingjinji" 4 "Beijing"
-label values region regionlab
+label values regionma regionlab
 
 format av_pop_tot %12.2f
-
-drop filenum
+ren regionma region
 
 save "$datadir/intermediate/pop_region.dta", replace
 
@@ -145,7 +127,8 @@ clear
 
 * import info from table 4 from Ma et al (2019)
 * I saved this csv inside  the data folder in Box 
-import delimited "$datadir/pm_maetal.csv"
+import delimited "$datadir/pm_maetal.csv", varnames(1)
+ren ïregion region
 
 merge 1:1 region using  "$datadir/intermediate/pop_region.dta"
 
@@ -309,7 +292,7 @@ gen prop_suic_diff_`i' = (lives_`i' / diff_suicides)*100
 * lives saved as a proportion of suicides in 2013
 gen prop_suic_13_`i' = (lives_`i' / suicides2013)*100
 
-format prop_suic_diff_`i' prop_suic_13_`i'  %12.2f
+format prop_suic_diff_`i' prop_suic_13_`i'  %12.0f
 
 }
 
@@ -332,8 +315,8 @@ replace pos=n+1 if region==3
 replace pos=n+2 if region==4
 
 
-twoway (bar lives pos if data==1) ///
-       (bar lives pos if data==2) ///
+twoway (bar lives pos if data==1, lcolor(vermillion) fcolor(vermillion%50) lwidth(medthick)) ///
+       (bar lives pos if data==2, lcolor(eltblue) fcolor(eltblue%50) lwidth(medthick)) ///
 	   (scatter lives pos if data==1, m(i) mlabel(prop_suic_diff_) mlabposition(12)) ///
 	   (scatter lives pos if data==2, m(i) mlabel(prop_suic_diff_) mlabposition(12)) , ///
        legend(order(1 "policy goal" 2 "actual")) ///
