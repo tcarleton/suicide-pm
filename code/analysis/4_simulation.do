@@ -256,7 +256,7 @@ replace avpop_tot=pop2015 if nomissing==0
 
 * we have 68 counties for which there's no population data at all
 
-*******************************
+*******************************210202
 * Calculate lives saved
 ********************************
 
@@ -264,7 +264,9 @@ replace avpop_tot=pop2015 if nomissing==0
 gen lives_saved = yhat_diff*(avpop_tot/1000000) // this is: number of lives saved in each county in each week due to PM declines
 
 * total lives saved over the entire period, by county
+bysort dsp_code (lives_saved) : gen allmissing = mi(lives_saved[1])
 bysort dsp_code: egen lives_saved_tot = sum(lives_saved)
+replace lives_saved_tot = . if allmissing
 
 * save for plotting
 save "$datadir/lives_saved.dta", replace
@@ -339,6 +341,9 @@ replace dspname_Eng = "Hannan" if dsp_code==420113
 	
 count if lives_saved_tot!=.
 loc xmax = r(N)
+di `xmax'
+
+drop if rank>`xmax'
 
 twoway (dropline lives_saved_tot rank if top_pop==0, msymbol(smcircle) mcolor(gs8) msize(tiny) /// format of grey dots
 		lwidth(vthin) lpattern(solid) lcolor("236 133 95%80")) /// format of vertical lines/bars (area under graph)
@@ -349,8 +354,7 @@ twoway (dropline lives_saved_tot rank if top_pop==0, msymbol(smcircle) mcolor(gs
 		xtitle("Counties by rank order of avoided suicides") ///
 		xlabel(0(400)`xmax', labcolor(bg) tlength(0) nogrid) yline(0, lpattern(solid) lcolor(gs12) lwidth(vthin)) ///
 		xscale(r(0 `xmax') noextend) ylabel(-45(10)105)	///
-		legend(off) 	
-* Right now we label dsp_code-> could replace with county name		
+		legend(off) 		
 		
 graph export "$resdir/figures/Fig3A_rankorder.pdf", replace
 

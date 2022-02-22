@@ -14,9 +14,6 @@ if(length(new.packages)) install.packages(new.packages, repos = "http://cran.us.
 # Load packages 
 invisible(lapply(list.of.packages, library, character.only = TRUE))
 
-
-setwd("C:/Users/sunsh/Dropbox/suicide_pm_china")
-
 pollution <- read_dta(file.path(datadir,"pollution_county_daily_2013_2018.dta"))
 
 # SECTION I: COUNTY TREND COEFFICIENTS --------------------------------------------------------
