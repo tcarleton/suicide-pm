@@ -244,21 +244,22 @@ tab dsp_code if top_pop==1
 
 * label position
 gen pos=9
-replace pos=7 if dsp_code==	420113
-replace pos=9 if dsp_code== 310112
-replace pos=10 if dsp_code== 440306
+replace pos=7 if dsp_code==	320382
+replace pos=10 if dsp_code== 321322
 replace pos=10 if dsp_code== 310116
 
 * label key cities
-gen dspname_Eng = "Baoan" if dsp_code==440306 // missing
-replace dspname_Eng = "Guiping" if dsp_code==450881
-replace dspname_Eng = "Minhang" if dsp_code==310112 // missing
-replace dspname_Eng = "Jinshan" if dsp_code==310116 // missing
-replace dspname_Eng = "Dongguan" if dsp_code==441900 // missing
-replace dspname_Eng = "Pudong" if dsp_code==310115 // missing
-replace dspname_Eng = "Chaoyang" if dsp_code==110105 
-replace dspname_Eng = "Haidian" if dsp_code==110108 
-replace dspname_Eng = "Hannan" if dsp_code==420113  
+cap drop dspname_Eng
+gen dspname_Eng = "Binhai New District" if dsp_code==120116 
+replace dspname_Eng = "Minhang District" if dsp_code==310112
+replace dspname_Eng = "Baoshan District" if dsp_code==310113 
+replace dspname_Eng = "Pudong New District" if dsp_code==310115 
+replace dspname_Eng = "Pizhou City" if dsp_code==320382 
+replace dspname_Eng = "Shuyang County" if dsp_code==321322
+replace dspname_Eng = "Jinjiang City" if dsp_code==350582 
+replace dspname_Eng = "Lufeng City" if dsp_code==441581 
+replace dspname_Eng = "Puning City" if dsp_code==445281  
+replace dspname_Eng = "Wuhou District" if dsp_code==510107
 
 * x axis range	
 count if lives_saved_tot!=.

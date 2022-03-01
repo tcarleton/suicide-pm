@@ -6,7 +6,9 @@ shpdir = "~/Dropbox/suicide/raw_data/" # this is the location of the shapefiles 
 
 ### Packages
 list.of.packages <- c("tidyverse", "haven", "sf", "sp", "rgdal", "lubridate", "dplyr","raster", 
-                      "rgeos", "ggmap", "scales", "viridis", "gtable","grid","magritter","gridExtra")
+                      "rgeos", "ggmap", "scales", "viridis", "gtable","grid","magritter",
+                      "gridExtra", "rmapshaper","ggplot2", "RColorBrewer")
+
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 # Install missing packages 
 if(length(new.packages)) install.packages(new.packages, repos = "http://cran.us.r-project.org")
@@ -35,8 +37,6 @@ china_shp_plot <- china_shp %>%
 # MAP ================================================================
 
 # simplify for testing
-library("rmapshaper")
-library("RColorBrewer")
 simplepolys <- rmapshaper::ms_simplify(input = as(china_shp_plot, 'Spatial')) %>%
   st_as_sf()
 
@@ -44,7 +44,7 @@ mycolorvec = brewer.pal(11, "BrBG")
 start = -55
 end = 110
 
-breaks <- c(-50, 0,50,100)
+breaks <- c(-60, 0,60,120)
 
 # crop extent (weird shapes blow 18N)
 mycrop = function(shp) {
