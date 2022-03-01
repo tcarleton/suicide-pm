@@ -47,7 +47,7 @@ preserve
 loc smooth = "weekdate" // "modate"
 
 // collapse across different groups
-collapse (mean) d24_rate [aw=t_dsppop], by(`smooth')
+collapse (mean) d24_rate pm25 [aw=t_dsppop], by(`smooth')
 tempfile totrate
 save "`totrate'", replace
 
@@ -77,6 +77,7 @@ else {
 	}
 	
 // show linear trend line
+tw line pm25 `smooth', lcolor(eltblue) lpattern(shortdash)	
 	
 tw  line md24_rate `smooth', lcolor("167 203 226") lpattern(solid) || ///
 	line d24_rate `smooth', lcolor(black) lpattern(solid) lwidth(medthick) || ///

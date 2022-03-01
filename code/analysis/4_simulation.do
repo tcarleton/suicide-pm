@@ -142,131 +142,60 @@ if "`test'" == "FALSE" {
 ** new population data
 *---------------------------*
 
-// clean up county population data for merge
+// merge in crosswalk
+use "$datadir/pop/id_new.dta", clear
 
-use  "$datadir/pop2000_2019.dta", clear 
+* these counties (for which we have pollution data) have no 
+* available and matching  population data (N=339/2,845)
+drop if county_id_pop==. 
+tempfile cw
+save "`cw'", replace
 
-ren county_id dsp_code
+use "$datadir/pop/pop_new.dta", clear
+merge m:1 county_id_pop using "`cw'"
+drop _merge
+
+* these counties have population data but no matching IDs in the pollution data
+* (i.e., cannot match county IDs across the two datasets)
+drop if county_id_pol==.
+ren county_id_pol dsp_code
 
 // convert population to total levels (currently in units of 10,000)
 gen pop_tot = pop*10000
 
 sort dsp_code year
 
-* pollution data until 2018, so drop 2019
-drop if year==2019
+* pollution data range: 2013-2018
+keep if year>=2013 & year<=2018
 
 xtset dsp_code year
 
-keep if year>=2013
-keep year dsp_code pop_tot pop
+tempfile popdata
+save "`popdata'", replace
 
-tab year
-
-* unbalanced panel, more missings in the later years 
-
-** add observations to the year variable even if the population is missing
-* since we will impute missing values later
-
-tsfill, full
-tab year
-
-** CHECKING missings in population data
- 
-codebook pop_tot
-
-gen miss_pop_tot=1 if pop_tot==.
-replace miss_pop_tot=0 if pop_tot!=.
-
-tempfile ccpop
-save "`ccpop'", replace
+*---------------------------*
+** merge with simulated suicide rate changes
+*---------------------------*
 
 use "$datadir/yhats_simulated.dta", clear
 
-// Note that this merge is imperfect because of some important
-// county boundary changes that we cannot obtain correct population
-// data for.
-merge m:1 dsp_code year using "`ccpop'"
-
-// to merge with census data
-tostring dsp_code, gen(county_id)
-
-ren _merge merge_code_popdata
-
-preserve
-use "$datadir/pop2015.dta", clear
-tostring code, gen(county_id)
-tempfile pop2015
-save "`pop2015'", replace
-
-restore
-merge m:1 county_id using "`pop2015'"
-
-rename total pop2015
-
-* note that there are 95 counties without any population data that do have pm data
-* tab dsp_code if pop_tot==. & pop2015==.
-
-* drop the counties that don't appear in pm or population data
-drop if _merge==2
-
-drop aqi county_id o3 pm10 so2 no2 co uniqueccode _merge merge_code_popdata
-
-* check population data
-replace miss_pop_tot=1 if  miss_pop_tot==.
-
-tempfile merged_data
-save "`merged_data'", replace
-
-** check number of weeks with missing population data in each county that did not merge
-
-collapse (sum) miss_pop_tot, by(dsp_code year) 
-
-gen nomissing=(miss_pop_tot==0)
-
-collapse (sum) miss_pop_tot nomissing, by(dsp_code) 
-
-rename miss_pop_tot miss_pop_wks
-save "$datadir/Counties_missingpopdata.dta", replace
-
-*******************************************
-* Fill in holes in population data
-*******************************************
-
-use "`merged_data'", clear
-merge m:1 dsp_code using "$datadir/Counties_missingpopdata.dta"
-
+merge m:1 dsp_code year using "`popdata'"
+* all the unmerged observations are those for which county_id_pop==. in id_new.dta
+* that is, they have no matching population data available (N=339/2845)
+drop if _merge==1
 drop _merge
 
-drop if week>396
-* only 1 county satistfies this (only has census data)
-
-* still unbalanced panel
-xtset dsp_code week
-drop if year==2018
-
-** Identify which counties do not have any population data
-* nomissing=0 are counties that don't have population data from yearbook
-
-* Calculate average population by county over study period
-bysort dsp_code: egen avpop_tot=mean(pop_tot)
-
-****** for those counties without any year of population in the yearbook data -> use census data
-replace avpop_tot=pop2015 if nomissing==0
-
-* we have 68 counties for which there's no population data at all
-
-*******************************210202
-* Calculate lives saved
-********************************
+*---------------------------*
+** Calculate lives saved
+*---------------------------*
 
 * total lives in each week -- NOTE: regression is run in rates that are deaths per million people
-gen lives_saved = yhat_diff*(avpop_tot/1000000) // this is: number of lives saved in each county in each week due to PM declines
+gen lives_saved = yhat_diff*(pop_tot/1000000) // this is: number of lives saved in each county in each week due to PM declines
 
 * total lives saved over the entire period, by county
 bysort dsp_code (lives_saved) : gen allmissing = mi(lives_saved[1])
 bysort dsp_code: egen lives_saved_tot = sum(lives_saved)
-replace lives_saved_tot = . if allmissing
+replace lives_saved_tot = . if allmissing // missingness here from missing aqi data
 
 * save for plotting
 save "$datadir/lives_saved.dta", replace
@@ -284,13 +213,6 @@ di "Total lives saved over 2013-2017 period = " lives_saved[1]
 * Total lives saved over 2013-2017 period = 40430.009
 
 restore
-/*
-br dsp_code week pm25_detrended yhat_diff pop_tot pop_totm lives_saved lives_saved_tot if lives_saved ==.
-* note that there are still cases in which lives saved is missing because
-* pm data is missing and/or population data is missing
-* e.g. in county  in county dsp_code==542325 there are holes in the pollution data
-br if dsp_code==542325
-*/
 
 qui summ week if lives_saved !=.
 keep if week==`r(max)'
@@ -311,13 +233,13 @@ di "Number of counties included in calculation = " r(N)
 *2721 counties	
 
 ** find 10 most populous counties
-gen neg_avpoptot= - avpop_tot
-sort neg_avpoptot
+gen neg_poptot= - pop_tot
+sort neg_poptot
 
-gen rank_avpoptot=_n
+gen rank_poptot=_n
 
 * 10 most populous counties:
-gen top_pop=(rank_avpoptot<11)
+gen top_pop=(rank_poptot<11)
 tab dsp_code if top_pop==1
 
 * label position
@@ -338,11 +260,10 @@ replace dspname_Eng = "Chaoyang" if dsp_code==110105
 replace dspname_Eng = "Haidian" if dsp_code==110108 
 replace dspname_Eng = "Hannan" if dsp_code==420113  
 
-	
+* x axis range	
 count if lives_saved_tot!=.
 loc xmax = r(N)
 di `xmax'
-
 drop if rank>`xmax'
 
 twoway (dropline lives_saved_tot rank if top_pop==0, msymbol(smcircle) mcolor(gs8) msize(tiny) /// format of grey dots
@@ -353,7 +274,7 @@ twoway (dropline lives_saved_tot rank if top_pop==0, msymbol(smcircle) mcolor(gs
 		ytitle("Total avoided suicides per county: 2013-2017")  ///
 		xtitle("Counties by rank order of avoided suicides") ///
 		xlabel(0(400)`xmax', labcolor(bg) tlength(0) nogrid) yline(0, lpattern(solid) lcolor(gs12) lwidth(vthin)) ///
-		xscale(r(0 `xmax') noextend) ylabel(-45(10)105)	///
+		xscale(r(0 `xmax') noextend) 	/// 
 		legend(off) 		
 		
 graph export "$resdir/figures/Fig3A_rankorder.pdf", replace
