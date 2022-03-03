@@ -6,12 +6,12 @@ shpdir = "~/Dropbox/suicide/raw_data/" # this is the location of the shapefiles 
 
 ### Packages
 list.of.packages <- c("tidyverse", "haven", "sf", "sp", "rgdal", "lubridate", "dplyr","raster", 
-                      "rgeos", "ggmap", "scales", "viridis", "gtable","grid","magritter",
+                      "rgeos", "ggmap", "scales", "viridis", "gtable","grid",
                       "gridExtra", "rmapshaper","ggplot2", "RColorBrewer")
 
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 # Install missing packages 
-if(length(new.packages)) install.packages(new.packages, repos = "http://cran.us.r-project.org")
+if(length(new.packages)) install.packages(new.packages[TRUE], repos = "http://cran.us.r-project.org")
 
 # Load packages 
 invisible(lapply(list.of.packages, library, character.only = TRUE))
@@ -41,10 +41,10 @@ simplepolys <- rmapshaper::ms_simplify(input = as(china_shp_plot, 'Spatial')) %>
   st_as_sf()
 
 mycolorvec = brewer.pal(11, "BrBG")
-start = -55
-end = 110
+start = -60
+end = 160
 
-breaks <- c(-60, 0,60,120)
+breaks <- c(-60, -30, 0,30,60,90,120,150)
 
 # crop extent (weird shapes blow 18N)
 mycrop = function(shp) {
@@ -64,7 +64,7 @@ ggplot() +
   geom_sf(data = simple_pro, fill = NA, color = alpha("gray40", 1 / 2), size = 0.3) +
   geom_sf(data = simple_city, fill = NA, color = alpha("gray40", 1 / 2), size = 0.1) +
   scale_fill_gradientn(colors = mycolorvec,
-                       values=rescale(c(start, start/2, 0, end/10, end)),
+                       values=rescale(c(start, start/2, 0, end/8, end)),
                        limits = c(start, end),
                        na.value = "grey70",
                        breaks = breaks,

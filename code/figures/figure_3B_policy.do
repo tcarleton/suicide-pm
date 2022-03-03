@@ -37,41 +37,26 @@ set scheme plotplain
 **********************************************************************************
 
 
-** Calculate total population in each region in Table 4 of Ma et al
-use  "$datadir/pop2000_2019.dta", clear 
+*---------------------------*
+** new population data
+*---------------------------*
+
+use "$datadir/pop/pop_new.dta", clear
 
 // convert population to total levels (currently in units of 10,000)
 gen pop_tot = pop*10000
 
-sort county_id year
+sort county_id_pop year
 
-* pollution data until 2018, so I'll drop them
-drop if year>2017   // since Ma et al show 2013-2017 changes in pm 
+* ma et al: 2013-2017 pollution declines
+keep if year>=2013 & year<=2017
 
-xtset county_id year
+xtset county_id_pop year
 
-keep if year>=2013
-
-gen dsp_code=county_id
-
-** extract the first 2 digits of the county code to identify regions
-tostring county_id, replace
-gen firstdigits=substr(county_id,1,2)
+* extract the first 2 digits of the county code to identify regions
+tostring county_id_pop, replace
+gen firstdigits=substr(county_id_pop,1,2)
 destring firstdigits, replace
-
-
-** merge with census data
-preserve
-use "$datadir/pop2015.dta", clear
-tostring code, gen(county_id)
-tempfile pop2015
-save "`pop2015'", replace
-
-restore
-merge m:1 county_id using "`pop2015'"
-
-rename total pop2015
-drop _merge
 
 ****** Region dummies
 
@@ -87,50 +72,45 @@ gen prd=(firstdigits==44)
 *  Jingjinji (note that it includes Beijing)
 gen jingjinji= (firstdigits==11 | firstdigits==12 | firstdigits==13) 
 
-* Region
-gen regionma=.
-replace regionma=1 if yrd==1
-replace regionma=2 if prd==1
-replace regionma=3 if jingjinji==1
-replace regionma = 4 if beijing==1 
+* Compute average population in each region over the 2013-2017 period
+gen insample_ma = (beijing==1 | yrd==1 | prd ==1 | jingjinji==1)
+keep if insample_ma
+bysort county_id_pop: egen avpop_tot = mean(pop_tot)
+collapse (mean) avpop_tot beijing yrd prd jingjinji, by(county_id_pop)
 
-** since there are missings in the population data I'll use the average over the study period
-bysort dsp_code: egen av_pop_tot=mean(pop_tot)
+* have to compute sums this way because there is not a 1:1 mapping from counties to regions
+egen avpop_beijing = sum(avpop_tot) if beijing==1
+egen avpop_yrd = sum(avpop_tot) if yrd==1
+egen avpop_prd = sum(avpop_tot) if prd==1
+egen avpop_jing = sum(avpop_tot) if jingjinji==1
 
-drop if year==.
+* collapse
+drop avpop_tot
+collapse (min) avpop_*
 
-tempfile countypop
-save "`countypop'", replace
+* reshape
+xpose, clear
+ren v1 avg_pop
+gen region = "Beijing" in 1
+replace region = "YRD" in 2
+replace region = "PRD" in 3
+replace region = "Jingjinji" in 4
 
-collapse (firstnm) av_pop_tot pop2015, by(dsp_code regionma)
-drop if regionma==.
+tempfile popdata
+save "`popdata'", replace
 
-** there are some counties in YRD that have missing population data in all years
-* use census data instead
-
-replace av_pop_tot= pop2015 if av_pop_tot==.
-
-* now add the average population over 2013-2017 in each county by region
-collapse (sum) av_pop_tot, by(regionma)
-
-sort regionma
-
-label define regionlab 1 "YRD" 2 "PRD" 3 "Jingjinji" 4 "Beijing"
-label values regionma regionlab
-
-format av_pop_tot %12.2f
-ren regionma region
-
-save "$datadir/intermediate/pop_region.dta", replace
+*---------------------------*
+** Ma et al estimates
+*---------------------------*
 
 clear
 
 * import info from table 4 from Ma et al (2019)
-* I saved this csv inside  the data folder in Box 
 import delimited "$datadir/pm_maetal.csv", varnames(1)
-ren ïregion region
+ren ïregion region_order
+ren region_name region
 
-merge 1:1 region using  "$datadir/intermediate/pop_region.dta"
+merge 1:1 region using  "`popdata'"
 
 drop _merge
 
@@ -141,8 +121,8 @@ label var pm25_13 "pm 2.5 level 2013"
 label var pm25_17 "pm 2.5 level 2017"
 
 * for Beijing the goal was controlling pm 2.5 at a level of 60
-replace pm25_pdec_1=(pm25_13 -60)/pm25_13 if region==4
-replace pm25_pdec_2= (pm25_13 - pm25_17)/ pm25_13 if region==4
+replace pm25_pdec_1=(pm25_13 -60)/pm25_13 if region=="Beijing"
+replace pm25_pdec_2= (pm25_13 - pm25_17)/ pm25_13 if region=="Beijing"
 
 * calculate pm 2.5 decrease in levels
 forvalues i=1/2 {
@@ -151,12 +131,18 @@ forvalues i=1/2 {
 
 label var pm25_dec_1 "pm 2.5 decrease goal"
 label var pm25_dec_2 "pm 2.5 decrease actual"
- 
-save  "$datadir/intermediate/pmpop_maetal.dta", replace
 
-***************************
-** Calculate # of suicides
-***************************
+tempfile maetal
+save "`maetal'", replace
+
+*---------------------------*
+** Calculate the number of suicides avoided
+** due to overall downward trends for all
+** districts in the Ma et al regions
+*---------------------------*
+
+** START EDITING HERE: NEEDS TO BE UPDATED WITH NEW POP DATA ABOVE
+** POSSIBLY NEED TO CHANGE THE ABOVE STEPS TO USE COUNTY_ID_POL?? **
 
 use "data_winsorize.dta", clear
 
@@ -178,7 +164,6 @@ tostring dsp_code, gen(county)
 gen firstdigits=substr(county,1,2)
 destring firstdigits, replace
 
-
 ****** Region dummies
 
 * Beijing
@@ -192,6 +177,22 @@ gen prd=(firstdigits==44)
 
 *  Jingjinji (note that it includes Beijing)
 gen jingjinji= (firstdigits==11 | firstdigits==12 | firstdigits==13) 
+
+**** TAMMA START EDITING HERE 
+
+* Compute total suicides by year by region over the 2013-2017 period
+gen insample_ma = (beijing==1 | yrd==1 | prd ==1 | jingjinji==1)
+keep if insample_ma
+bysort dsp_code year: egen totsui = sum(suicides)
+collapse (mean) avpop_tot beijing yrd prd jingjinji, by(county_id_pop)
+
+* have to compute sums this way because there is not a 1:1 mapping from counties to regions
+egen avpop_beijing = sum(avpop_tot) if beijing==1
+egen avpop_yrd = sum(avpop_tot) if yrd==1
+egen avpop_prd = sum(avpop_tot) if prd==1
+egen avpop_jing = sum(avpop_tot) if jingjinji==1
+
+
 
 * Region
 gen region=.
