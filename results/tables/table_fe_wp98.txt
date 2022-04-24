@@ -1,0 +1,16 @@
+		(1)	(2)	(3)	(4)	(5)	(6)	(7)	(8)	(9)	(10)	(11)	(12)	(13)	(14)	(15)
+VARIABLES	LABELS	d24_rate	fd24_rate	md24_rate	d24_rate	fd24_rate	md24_rate	d24_rate	fd24_rate	md24_rate	d24_rate	fd24_rate	md24_rate	d24_rate	fd24_rate	md24_rate
+																
+pm25	ug/m3	0.0079***	0.0064**	0.0048	0.0060**	0.0059**	0.0037	0.0079***	0.0034	0.0065*	0.0077***	0.0063**	0.0044	0.0070**	0.0058**	0.0040
+		(0.0029)	(0.0030)	(0.0033)	(0.0025)	(0.0025)	(0.0029)	(0.0028)	(0.0031)	(0.0037)	(0.0028)	(0.0028)	(0.0032)	(0.0028)	(0.0029)	(0.0032)
+																
+Observations		139,196	139,105	139,187	139,110	139,017	139,098	139,196	139,105	139,187	139,196	139,105	139,187	139,196	139,105	139,187
+R-squared		-0.0111	-0.0057	-0.0021	-0.0058	-0.0046	-0.0010	-0.0088	-0.0009	-0.0032	-0.0086	-0.0043	-0.0008	-0.0061	-0.0030	0.0006
+IV		TINumD1	TINumD1	TINumD1	TINumD1	TINumD1	TINumD1	TINumD1	TINumD1	TINumD1	TINumD1	TINumD1	TINumD1	TINumD1	TINumD1	TINumD1
+Weather		Quadratic	Quadratic	Quadratic	Quadratic	Quadratic	Quadratic	Quadratic	Quadratic	Quadratic	Quadratic	Quadratic	Quadratic	Quadratic	Quadratic	Quadratic
+FE		County FE and Week FE	County FE and Week FE	County FE and Week FE	County-year FE and Week FE	County-year FE and Week FE	County-year FE and Week FE	County-month FE and Week FE	County-month FE and Week FE	County-month FE and Week FE	County FE and Week FE and Province trend	County FE and Week FE and Province trend	County FE and Week FE and Province trend	County FE and Week FE and County trend	County FE and Week FE and County trend	County FE and Week FE and County trend
+Clustering		County and week	County and week	County and week	County and week	County and week	County and week	County and week	County and week	County and week	County and week	County and week	County and week	County and week	County and week	County and week
+KP Test		41.84	41.99	43.04	60.06	60.24	61.47	58.99	59.22	59.42	48.04	48.17	49.41	45.04	45.18	46.25
+p-value		1.61e-08	1.55e-08	1.12e-08	1.40e-10	1.36e-10	9.83e-11	9.06e-11	8.58e-11	7.69e-11	2.58e-09	2.51e-09	1.75e-09	6.21e-09	5.97e-09	4.35e-09
+Robust standard errors in parentheses																
+*** p<0.01, ** p<0.05, * p<0.1																

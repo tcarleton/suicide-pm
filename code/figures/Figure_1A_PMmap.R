@@ -2,11 +2,11 @@
 rm(list=ls())
 setwd("~/Dropbox/Works_in_progress/git_repos/suicide-pm") # this is the location of the cloned repository 
 datadir = "~/Dropbox/suicide/main_2017/" # this is the location of the data released for replication of the paper 
-shpdir = "~/Dropbox/suicide/raw_data/" # this is the location of the shapefiles for Chinese counties
+shpdir = "~/Dropbox/suicide/raw_data" # this is the location of the shapefiles for Chinese counties
 
 ### Packages
 list.of.packages <- c("tidyverse", "haven", "sf", "sp", "rgdal", "lubridate", "dplyr","raster", 
-                      "rgeos", "ggmap", "scales", "viridis", "gtable","grid","magritter","gridExtra")
+                      "rgeos", "ggmap", "scales", "viridis", "gtable","grid","gridExtra")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 # Install missing packages 
 if(length(new.packages)) install.packages(new.packages, repos = "http://cran.us.r-project.org")
@@ -73,9 +73,9 @@ write.csv(china_pollution, file.path(datadir,"chn_pollution.csv"), row.names = F
 # SECTION II: POLLUTION AVERAGE MAP --------------------------------------------------------
 
 china_pollution <- read.csv(file.path(datadir,"chn_pollution.csv"))
-china_shp <- st_read(file.path(shpdir, "china_fixed","chn_fixed.shp"), stringsAsFactors = FALSE)  
-china_pro <- st_read(file.path(shpdir, "china_province","china_province.shp"), stringsAsFactors = FALSE)  
-china_city <- st_read(file.path(shpdir,"china_city", "chn_city.shp"), stringsAsFactors = FALSE)  
+china_shp <- st_read(file.path(shpdir, "china_fixed_updated","china__fixed","china__fixed.shp"), stringsAsFactors = FALSE)  
+china_pro <- st_read(file.path(shpdir, "china_province_updated","china__province", "china_province.shp"), stringsAsFactors = FALSE)  
+china_city <- st_read(file.path(shpdir,"china_city_updated", "china__city","china_city.shp"), stringsAsFactors = FALSE)  
 
 china_shp_plot <- china_shp %>%
   mutate(ADMINCODE = as.numeric(ADMINCODE)) %>%
@@ -165,26 +165,33 @@ ggplot() +
 china_shp_plot <- china_shp %>%
   mutate(ADMINCODE = as.numeric(ADMINCODE)) %>%
   left_join(china_pollution, by = c("ADMINCODE" = "county_id"))  %>% 
-  select(ADMINCODE, coeff_pm10, coeff_pm25, coeff_aqi) %>%
+  dplyr::select(ADMINCODE, coeff_pm10, coeff_pm25, coeff_aqi) %>%
   gather(key = "indicator", value = "coef", -c(ADMINCODE, geometry)) %>%
   mutate(indicator = sub("coeff_", "", indicator))
 
   # NOTE: the following code creates a dummy variable for significance level threshold 0.05
   #       skip if you do not want outline counties by coefficient significance level 
+# 
+# pm_25sig <- china_shp_plot %>%
+#   mutate(province = gsub("....$", "", ADMINCODE))
+# 
+# df <- pm_25sig %>% dplyr::select(province)
+# df$geometry <- NULL
+# 
+# spdf <- pm_25sig$geometry %>% as_Spatial()
+# pm_25sig_pro <- SpatialPolygonsDataFrame(spdf, df, match.ID = FALSE)
+# pm_25sig_pro_agg<- raster::aggregate(pm_25sig_pro, by = "province")
+# pm_25sig_pro_st <- pm_25sig_pro_agg %>% st_as_sf()
 
-pm_25sig <- china_shp_plot %>%
-  mutate(province = gsub("....$", "", ADMINCODE))
+# only want coefficient on pm25
+china_shp_plot = china_shp_plot %>% filter(indicator=="pm25")
 
-df <- pm_25sig %>% dplyr::select(province)
-df$geometry <- NULL
-
-spdf <- pm_25sig$geometry %>% as_Spatial()
-pm_25sig_pro <- SpatialPolygonsDataFrame(spdf, df, match.ID = FALSE)
-pm_25sig_pro_agg<- raster::aggregate(pm_25sig_pro, by = "province")
-pm_25sig_pro_st <- pm_25sig_pro_agg %>% st_as_sf()
+# simplify geometries  
+simplepolys <- rmapshaper::ms_simplify(input = as(china_shp_plot, 'Spatial')) %>%
+  st_as_sf()
 
 ggplot() +
-  geom_sf(data = china_shp_plot, aes(fill = coeff_pm25), color = NA) +
+  geom_sf(data = simplepolys, aes(fill = coef), color = NA) +
   geom_sf(data = china_pro, fill = NA, color = "gray40", size = 0.3) +
   geom_sf(data = china_city, fill = NA, color = alpha("gray40", 1 / 2), size = 0.1) +
   
@@ -204,11 +211,11 @@ ggplot() +
                          label.hjust = 0.5
                        )) +  
   
-  scale_y_continuous(limits = c(20,55)) +
+  #scale_y_continuous(limits = c(20,55)) +
   
-  labs(fill = "Trend Coefficient",
-       title = "China's regional demographics",
-       subtitle = "County-level PM 2.5 Trend, 2013 ~ 2017") +
+  labs(fill = expression(paste(mu,'g/',m^3,' per day')),
+       title = "Changes in county-level pollution",
+       subtitle = "Trend in PM2.5, 2013 ~ 2017") +
   
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
@@ -219,4 +226,4 @@ ggplot() +
         axis.text = element_blank(),
         legend.position = "bottom",
         strip.background = element_rect(fill="white", size=1.5),
-        strip.text.x = element_text(size = 10)); ggsave(file.path("results","figures","Figure_1A_PMmap.pdf"), width = 20, height = 20, units = "cm")
+        strip.text.x = element_text(size = 10)); ggsave(file.path("results","figures","Figure_1A_PMmap.png"), width = 20, height = 20, units = "cm")

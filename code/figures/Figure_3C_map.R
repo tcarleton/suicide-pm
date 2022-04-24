@@ -19,16 +19,16 @@ invisible(lapply(list.of.packages, library, character.only = TRUE))
 sims <- read_dta(file.path(datadir,"lives_saved.dta"))
 
 # keep relevant variables
-sims <- sims %>% dplyr::select(dsp_code, week, year, month, code, provcode, provname, dspname, avpop_tot, lives_saved, lives_saved_tot)
+sims <- sims %>% dplyr::select(dsp_code, week, year, month, lives_saved, lives_saved_tot)
 
 # collapse to total lives saved over the period
 sims_plot <- sims %>% group_by(dsp_code) %>% summarise(lives_saved_tot = last(lives_saved_tot))
 
 # MAP SETUP  --------------------------------------------------------
 
-china_shp <- st_read(file.path(shpdir, "china_fixed","chn_fixed.shp"), stringsAsFactors = FALSE)  
-china_pro <- st_read(file.path(shpdir, "china_province","china_province.shp"), stringsAsFactors = FALSE)  
-china_city <- st_read(file.path(shpdir,"china_city", "chn_city.shp"), stringsAsFactors = FALSE)  
+china_shp <- st_read(file.path(shpdir, "china_fixed_updated","china__fixed","china__fixed.shp"), stringsAsFactors = FALSE)  
+china_pro <- st_read(file.path(shpdir, "china_province_updated","china__province", "china_province.shp"), stringsAsFactors = FALSE)  
+china_city <- st_read(file.path(shpdir,"china_city_updated", "china__city","china_city.shp"), stringsAsFactors = FALSE)  
 
 china_shp_plot <- china_shp %>%
   mutate(ADMINCODE = as.numeric(ADMINCODE)) %>%
@@ -40,29 +40,31 @@ china_shp_plot <- china_shp %>%
 simplepolys <- rmapshaper::ms_simplify(input = as(china_shp_plot, 'Spatial')) %>%
   st_as_sf()
 
+library(RColorBrewer)
 mycolorvec = brewer.pal(11, "BrBG")
 start = -60
-end = 160
+end = 120
 
-breaks <- c(-60, -30, 0,30,60,90,120,150)
+breaks <- c(-60, -30, 0,30,60,90,120)
 
 # crop extent (weird shapes blow 18N)
-mycrop = function(shp) {
-  out = st_crop(shp, xmin = 73.4, xmax = 135.1,
-                ymin = 18.2, ymax = 53.6)
-  return(out)
-}
-
-simple_crp = mycrop(simplepolys)
-simple_pro = mycrop(china_pro)
-simple_city = mycrop(china_city)
+# UPDATE: DO NOT CROP, POLITICALLY IMPORTANT ISLANDS
+# mycrop = function(shp) {
+#   out = st_crop(shp, xmin = 73.4, xmax = 135.1,
+#                 ymin = 18.2, ymax = 53.6)
+#   return(out)
+# }
+# 
+# simple_crp = mycrop(simplepolys)
+# simple_pro = mycrop(china_pro)
+# simple_city = mycrop(china_city)
 
 # continues scale
 ggplot() +
   #geom_sf(data = china_shp_plot, aes(fill = lives_saved_tot), color = NA) +
-  geom_sf(data = simple_crp, aes(fill = lives_saved_tot), color = NA) +
-  geom_sf(data = simple_pro, fill = NA, color = alpha("gray40", 1 / 2), size = 0.3) +
-  geom_sf(data = simple_city, fill = NA, color = alpha("gray40", 1 / 2), size = 0.1) +
+  geom_sf(data = simplepolys, aes(fill = lives_saved_tot), color = NA) +
+  geom_sf(data = china_pro, fill = NA, color = alpha("gray40", 1 / 2), size = 0.3) +
+  geom_sf(data = china_city, fill = NA, color = alpha("gray40", 1 / 2), size = 0.1) +
   scale_fill_gradientn(colors = mycolorvec,
                        values=rescale(c(start, start/2, 0, end/8, end)),
                        limits = c(start, end),

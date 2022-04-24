@@ -1,0 +1,16 @@
+		(1)	(2)	(3)	(4)	(5)	(6)	(7)	(8)	(9)	(10)	(11)	(12)
+VARIABLES	LABELS	d24_rate	fd24_rate	md24_rate	d24_rate	fd24_rate	md24_rate	d24_rate	fd24_rate	md24_rate	d24_rate	fd24_rate	md24_rate
+													
+pm25	ug/m3	0.0070***	0.0056**	0.0042	0.0070***	0.0056**	0.0042	0.0070***	0.0056**	0.0042	0.0070**	0.0056**	0.0042
+		(0.0022)	(0.0025)	(0.0031)	(0.0023)	(0.0026)	(0.0029)	(0.0027)	(0.0027)	(0.0033)	(0.0027)	(0.0028)	(0.0032)
+													
+Observations		139,196	139,105	139,187	139,196	139,105	139,187	139,196	139,105	139,187	139,196	139,105	139,187
+R-squared		-0.0087	-0.0044	-0.0016	-0.0087	-0.0044	-0.0016	-0.0087	-0.0044	-0.0016	-0.0087	-0.0044	-0.0016
+IV		TINumD1	TINumD1	TINumD1	TINumD1	TINumD1	TINumD1	TINumD1	TINumD1	TINumD1	TINumD1	TINumD1	TINumD1
+Weather		Quadratic	Quadratic	Quadratic	Quadratic	Quadratic	Quadratic	Quadratic	Quadratic	Quadratic	Quadratic	Quadratic	Quadratic
+FE		County FE and Week FE	County FE and Week FE	County FE and Week FE	County FE and Week FE	County FE and Week FE	County FE and Week FE	County FE and Week FE	County FE and Week FE	County FE and Week FE	County FE and Week FE	County FE and Week FE	County FE and Week FE
+Clustering		No	No	No	Week	Week	Week	County	County	County	County and week	County and week	County and week
+KP Test		1029	1036	1050	65.05	65.11	66.48	126.7	127	131	45.39	45.45	46.58
+p-value		0	0	0	0	0	0	0	0	0	5.72e-09	5.64e-09	4.06e-09
+Standard errors in parentheses													
+*** p<0.01, ** p<0.05, * p<0.1													
