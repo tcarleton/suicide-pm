@@ -43,10 +43,10 @@ loc p = "p98" // amount of winsorization
 loc felist "cMwFE" "counTFE" "cYwFE" "provTFE"
 loc weatherlist "binWeather" "linWeather" "noWeather" 
 loc cluslist "clNone" "clCounty" "clWeek"
-loc instlist "TIIndD1" "TIStrD1"
+loc instlist "TIIndD1" "TIStrD1" "OLS"
 
 // total obs = number of combinations
-loc obs = 13
+loc obs = 14
 
 **********************************************************************************
 * Pull in all robustness results                                                
@@ -126,9 +126,13 @@ gen ci95_hi = beta+1.96*se
 gen ci90_lo = beta-1.645*se
 gen ci90_hi = beta+1.645*se
 
+* put OLS at top
+replace row = 15 if instrument=="OLS"
+sort row
+replace row = row-1
 
 * main spec vertical line
-local x_line_main_spec = beta[_N]
+local x_line_main_spec = beta[_N-1]
 local zeroline = 0
 
 cap drop dummy
@@ -136,10 +140,10 @@ gen dummy = 0
 
 loc mycolor = "105 106 107" //"167 203 226"
 twoway /// 
-	(pci 0 `x_line_main_spec' 13 `x_line_main_spec', lcolor("`mycolor'") lwidth(thin) lp(shortdash)) /// line at main spec
+	(pci 0 `x_line_main_spec' 14 `x_line_main_spec', lcolor("`mycolor'") lwidth(thin) lp(shortdash)) /// line at main spec
 	(rspike ci95_lo ci95_hi row, horizontal color(gs10%40) yaxis(1)) ///
 	(rspike ci90_lo ci90_hi row, horizontal color("`mycolor'%80") yaxis(1)) ///
-	(pci 0 0 13 0, lcolor(black) lwidth(medthick)) /// line at 0
+	(pci 0 0 14 0, lcolor(black) lwidth(medthick)) /// line at 0
 	(scatter row beta if modelgroup == 1, mcolor("`mycolor'") yaxis(1) msymbol(circle) msize(medlarge)) /// 
 	(scatter row beta if modelgroup != 1, mcolor("`mycolor'") yaxis(1) msymbol(circle) mfcolor(white) msize(medlarge)) /// 
 	, ///
@@ -147,7 +151,8 @@ twoway ///
 	xtitle("Effect of PM2.5 on suicides per 10,000", size(medsmall)) /// 
 	xlabel(, nogrid) ///
 	ytitle("") ///
-	ylabel(13 "{bf:Main specification}" /// 	spec 1
+	ylabel(14 "OLS (no instrument)" /// OLS
+		13 "{bf:Main specification}" /// 	spec 1
 		12 "County x mo. FE" ///
 		11 "County trends" ///
 		10 "County x yr. FE" ///

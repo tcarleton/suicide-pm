@@ -208,7 +208,12 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
   addtext(County FE, Yes, Week FE, Yes, Clustering: County and week, Yes)
   
+  loc outfilester "$resdir/ster/winsor_p`pp'_`V'_OLS.ster"
+   
   reghdfe `V' $control pm25, absorb(dsp_code week) cluster(dsp_code week)
+  * save estimates for use in figures
+  estimates save "`outfilester'", replace
+  
   outreg2 using "`outfile'", label tex(frag) ///
   append ctitle(`V': FE) dec(4) ///
   keep(pm25) ///
