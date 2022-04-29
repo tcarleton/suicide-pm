@@ -47,16 +47,16 @@ loc p = "p98" // amount of winsorization
 *loc outcome_sex "md24_rate" "fd24_rate"
 *loc outcome_age "t0_15d24_rate" "t15_65d24_rate" "t65_85d24_rate"
 
-loc sexlist "m" "f"
-loc agelist "0_15" "15_65" "65_85"
-
+//loc sexlist "m" "f"
+//loc agelist "0_15" "15_65" "65_85"
+loc sexagelist "m0_15" "f0_15" "m15_65" "f15_65" "m65_85" "f65_85"
 loc pollutionlist "polluted" "lesspolluted"
 loc urbanlist "urban" "rural"
 loc incomelist "rich" "poor"
-
+loc avgsuilist "Tercile1" "Tercile2" "Tercile3"
 
 // total obs = number of combinations
-loc obs = 12
+loc obs = 16
 
 
 **********************************************************************************
@@ -79,6 +79,17 @@ gen beta = _b[pm25] if modelgroup==1
 gen se = _se[pm25] if modelgroup==1
 
 
+// loop over male/female by agelist
+loc i = 2
+foreach sex in "`sexagelist'" {
+	estimates use "$sterdir/winsor_p98_`sex'`outcome'_TINumD1.ster"
+	replace specification = "`sex'" in `i'
+	replace modelgroup = 2 in `i'
+	replace beta = _b[pm25] in `i'
+	replace se = _se[pm25] in `i'
+	loc i = `i'+1
+}
+/*
 // loop over male/female
 loc i = 2
 foreach sex in "`sexlist'" {
@@ -100,7 +111,7 @@ foreach age in "`agelist'" {
 	replace beta = _b[pm25] in `i'
 	replace se = _se[pm25] in `i'
 	loc i = `i'+1
-}
+}*/
 
 // loop over pollution levels
 qui count if beta!=.
@@ -108,7 +119,7 @@ loc i = r(N)+1
 foreach pollution in "`pollutionlist'" {
 	estimates use "$sterdir/winsor_p98_`outcome'_`pollution'.ster"
 	replace specification = "`pollution'" in `i'
-	replace modelgroup = 4  in `i'
+	replace modelgroup = 3  in `i'
 	replace beta = _b[pm25] in `i'
 	replace se = _se[pm25] in `i'
 	loc i = `i'+1
@@ -121,7 +132,7 @@ loc i = r(N)+1
 foreach urban in "`urbanlist'" {
 	estimates use "$sterdir/winsor_p98_`outcome'_`urban'.ster"
 	replace specification = "`urban'" in `i'
-	replace modelgroup = 5  in `i'
+	replace modelgroup = 4  in `i'
 	replace beta = _b[pm25] in `i'
 	replace se = _se[pm25] in `i'
 	loc i = `i'+1
@@ -134,6 +145,18 @@ loc i = r(N)+1
 foreach income in "`incomelist'" {
 	estimates use "$sterdir/winsor_p98_`outcome'_`income'.ster"
 	replace specification = "`income'" in `i'
+	replace modelgroup = 5  in `i'
+	replace beta = _b[pm25] in `i'
+	replace se = _se[pm25] in `i'
+	loc i = `i'+1
+}
+
+// loop over average suicide levels
+qui count if beta!=.
+loc i = r(N)+1
+foreach terc in "`avgsuilist'" {
+	estimates use "$sterdir/winsor_p98_`outcome'_avgsui`terc'.ster"
+	replace specification = "`terc'" in `i'
 	replace modelgroup = 6  in `i'
 	replace beta = _b[pm25] in `i'
 	replace se = _se[pm25] in `i'
@@ -150,11 +173,6 @@ gen ci90_lo = beta-1.645*se
 gen ci90_hi = beta+1.645*se
 
 
-* main spec vertical line
-local x_line_main_spec = beta[_N] // beta main specification (last obs)
-local zeroline = 0
-
-
 cap drop dummy
 gen dummy = 0
 
@@ -166,6 +184,10 @@ replace pos=row+2 if modelgroup==4
 replace pos=row+3 if modelgroup==3
 replace pos=row+4 if modelgroup==2
 replace pos=row+5 if modelgroup==1
+
+* main spec vertical line
+local x_line_main_spec = beta[_N] // beta main specification (last obs)
+local zeroline = 0
 
 
 loc mycolor = "105 106 107" //"167 203 226"
