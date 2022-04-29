@@ -81,7 +81,7 @@ ggplot() +
                          label.hjust = 0.5
                        )) +
   
-  labs(fill = "Avoided suicides",
+  labs(fill = "Total avoided suicides over 2013-2017",
        title = "Suicide deaths avoided due to pollution declines",
        subtitle = "2013 ~ 2017") +
   theme(panel.grid.major = element_blank(), 
