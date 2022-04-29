@@ -186,6 +186,9 @@ china_shp_plot <- china_shp %>%
 # only want coefficient on pm25
 china_shp_plot = china_shp_plot %>% filter(indicator=="pm25")
 
+# convert trends to per year (from per day)
+china_shp_plot$coef = china_shp_plot$coef*365
+
 # simplify geometries  
 simplepolys <- rmapshaper::ms_simplify(input = as(china_shp_plot, 'Spatial')) %>%
   st_as_sf()
@@ -199,7 +202,7 @@ ggplot() +
   #geom_sf(data = pm_25sig_pro_st, fill = NA,color = alpha("gold4", 0.5), size = 0.5) +
 
   scale_fill_distiller(palette = "RdBu", direction = - 1, na.value="grey70", 
-                       limits = c(-0.04, 0.04), oob = squish,
+                       limits = c(-12, 12), oob = squish,
                        guide = guide_colorbar(
                          direction = "horizontal",
                          barheight = unit(2, units = "mm"),
@@ -213,7 +216,7 @@ ggplot() +
   
   #scale_y_continuous(limits = c(20,55)) +
   
-  labs(fill = expression(paste(mu,'g/',m^3,' per day')),
+  labs(fill = expression(paste(mu,'g/',m^3,' per year')),
        title = "Changes in county-level pollution",
        subtitle = "Trend in PM2.5, 2013 ~ 2017") +
   
