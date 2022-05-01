@@ -178,41 +178,63 @@ foreach V of varlist d24_rate fd24_rate md24_rate *0_15d24_rate *15_65d24_rate *
 
 use "data_winsorize.dta", clear
 
-loc outfile = "$resdir/tables/table_polluted_wp`pp'.tex"
+tostring dsp_code, replace
+gen prov_code=substr(dsp_code,1,2)
+destring dsp_code prov_code, replace
 
-cap erase "$resdir/tables/table_polluted_wp`pp'.tex"
-cap erase "$resdir/tables/table_polluted_wp`pp'.txt"
+* avg pollution terciles
+preserve
+collapse (mean) pm25, by(dsp_code)
+xtile pm25_tile = pm25, nq(3)
+tempfile tiles
+save "`tiles'", replace
+restore
 
-*** check average PM by years
-tabstat pm25, by(year)
+merge m:1 dsp_code using "`tiles'"
+drop _merge
 
-*** generate indicator for polluted vs less polluted
-egen pm25_mean=mean(pm25), by(dsp_code)
+tabstat d24_rate fd24_rate md24_rate, by(pm25_tile)
 
-egen mean=mean(pm25_mean)
-gen polluted=1 if pm25_mean>=mean
-replace polluted=0 if polluted==.
-tabstat pm25, by (polluted)
+loc outfile = "$resdir/tables/table_avgPM25_wp`pp'.tex"
 
-* full sample
+cap erase "$resdir/tables/table_avgPM25_wp`pp'.tex"
+cap erase "$resdir/tables/table_avgPM25_wp`pp'.txt"
+
+*** baseline
 foreach V of varlist d24_rate fd24_rate md24_rate {
 
   ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week)
-  outreg2 using "`outfile'", label tex(frag) ///
+  outreg2 using "`outfile'", label tex(frag)  ///
   append ctitle(`V') dec(4) ///
   keep(pm25) ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
   addtext(Sample, Full, IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE, Clustering, County and week)
-  
+
 }
 *
 
-* polluted 
+** first tercile
 foreach V of varlist d24_rate fd24_rate md24_rate {
 
-  loc outfilester "$resdir/ster/winsor_p`pp'_`V'_polluted.ster"
+  loc outfilester "$resdir/ster/winsor_p`pp'_`V'_avgPM25Tercile1.ster"
   
-  ivreghdfe `V' $control2 (pm25=TINumD1) if polluted==1, absorb(dsp_code week) cluster(dsp_code week)
+  ivreghdfe `V' $control2 (pm25=TINumD1) if pm25_tile==1, absorb(dsp_code week) cluster(dsp_code week)
+  
+  estimates save "`outfilester'", replace
+  
+  outreg2 using "`outfile'", label tex(frag)  ///
+  append ctitle(`V') dec(4) ///
+  keep(pm25) ///
+  addstat(KP Test,e(widstat), p-value, e(idp)) ///
+  addtext(Sample, Tercile1, IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE, Clustering, County and week)
+}
+
+** second tercile
+foreach V of varlist d24_rate fd24_rate md24_rate {
+
+  loc outfilester "$resdir/ster/winsor_p`pp'_`V'_avgPM25Tercile2.ster"
+  
+  ivreghdfe `V' $control2 (pm25=TINumD1) if pm25_tile==2, absorb(dsp_code week) cluster(dsp_code week)
   
   estimates save "`outfilester'", replace
   
@@ -220,17 +242,16 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
   append ctitle(`V') dec(4) ///
   keep(pm25) ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
-  addtext(Sample, Polluted, IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE, Clustering, County and week)
-  
+  addtext(Sample, Tercile2, IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE, Clustering, County and week)
 }
-*
 
-* less polluted 
+*** highest tercile
+
 foreach V of varlist d24_rate fd24_rate md24_rate {
 
-  loc outfilester "$resdir/ster/winsor_p`pp'_`V'_lesspolluted.ster"
+  loc outfilester "$resdir/ster/winsor_p`pp'_`V'_avgPM25Tercile3.ster"
   
-  ivreghdfe `V' $control2 (pm25=TINumD1) if polluted==0, absorb(dsp_code week) cluster(dsp_code week)
+  ivreghdfe `V' $control2 (pm25=TINumD1) if pm25_tile==3, absorb(dsp_code week) cluster(dsp_code week)
   
   estimates save "`outfilester'", replace
   
@@ -238,10 +259,10 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
   append ctitle(`V') dec(4) ///
   keep(pm25) ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
-  addtext(Sample, Less Polluted, IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE, Clustering, County and week)
-  
+  addtext(Sample, Tercile3, IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE, Clustering, County and week)
 }
 *
+
 
 **********************************************************************************
 *						                                                         *
@@ -575,7 +596,7 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
   addtext(Sample, Tercile2, IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE, Clustering, County and week)
 }
 
-*** above median
+*** highest tercile
 
 foreach V of varlist d24_rate fd24_rate md24_rate {
 

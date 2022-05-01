@@ -44,19 +44,15 @@ loc p = "p98" // amount of winsorization
 */
 
 // heterogeneity sets
-*loc outcome_sex "md24_rate" "fd24_rate"
-*loc outcome_age "t0_15d24_rate" "t15_65d24_rate" "t65_85d24_rate"
-
-//loc sexlist "m" "f"
-//loc agelist "0_15" "15_65" "65_85"
 loc sexagelist "m0_15" "f0_15" "m15_65" "f15_65" "m65_85" "f65_85"
-loc pollutionlist "polluted" "lesspolluted"
+loc seasonlist "spring" "summer" "fall" "winter"
 loc urbanlist "urban" "rural"
 loc incomelist "rich" "poor"
-loc avgsuilist "Tercile1" "Tercile2" "Tercile3"
+loc avgPM25list "avgPM25Tercile1" "avgPM25Tercile2" "avgPM25Tercile3"
+loc avgsuilist "avgsuiTercile1" "avgsuiTercile2" "avgsuiTercile3"
 
 // total obs = number of combinations
-loc obs = 16
+loc obs = 21
 
 
 **********************************************************************************
@@ -89,42 +85,18 @@ foreach sex in "`sexagelist'" {
 	replace se = _se[pm25] in `i'
 	loc i = `i'+1
 }
-/*
-// loop over male/female
-loc i = 2
-foreach sex in "`sexlist'" {
-	estimates use "$sterdir/winsor_p98_`sex'`outcome'_TINumD1.ster"
-	replace specification = "`sex'" in `i'
-	replace modelgroup = 2 in `i'
-	replace beta = _b[pm25] in `i'
-	replace se = _se[pm25] in `i'
-	loc i = `i'+1
-}
 
-// loop over age groups
+// loop over seasons
 qui count if beta!=.
 loc i = r(N)+1
-foreach age in "`agelist'" {
-	estimates use "$sterdir/winsor_p98_t`age'`outcome'_TINumD1.ster"
-	replace specification = "`age'" in `i'
-	replace modelgroup = 3  in `i'
-	replace beta = _b[pm25] in `i'
-	replace se = _se[pm25] in `i'
-	loc i = `i'+1
-}*/
-
-// loop over pollution levels
-qui count if beta!=.
-loc i = r(N)+1
-foreach pollution in "`pollutionlist'" {
-	estimates use "$sterdir/winsor_p98_`outcome'_`pollution'.ster"
-	replace specification = "`pollution'" in `i'
+foreach seas in "`seasonlist'" {
+	estimates use "$sterdir/winsor_p98_`outcome'_`seas'.ster"
+	replace specification = "`seas'" in `i'
 	replace modelgroup = 3  in `i'
 	replace beta = _b[pm25] in `i'
 	replace se = _se[pm25] in `i'
 	loc i = `i'+1
 }
-
 
 // loop over urban/rural
 qui count if beta!=.
@@ -151,13 +123,27 @@ foreach income in "`incomelist'" {
 	loc i = `i'+1
 }
 
+
+// loop over pollution levels
+qui count if beta!=.
+loc i = r(N)+1
+foreach terc in "`avgPM25list'" {
+	estimates use "$sterdir/winsor_p98_`outcome'_`terc'.ster"
+	replace specification = "`terc'" in `i'
+	replace modelgroup = 6  in `i'
+	replace beta = _b[pm25] in `i'
+	replace se = _se[pm25] in `i'
+	loc i = `i'+1
+}
+
+
 // loop over average suicide levels
 qui count if beta!=.
 loc i = r(N)+1
 foreach terc in "`avgsuilist'" {
-	estimates use "$sterdir/winsor_p98_`outcome'_avgsui`terc'.ster"
+	estimates use "$sterdir/winsor_p98_`outcome'_`terc'.ster"
 	replace specification = "`terc'" in `i'
-	replace modelgroup = 6  in `i'
+	replace modelgroup = 7  in `i'
 	replace beta = _b[pm25] in `i'
 	replace se = _se[pm25] in `i'
 	loc i = `i'+1
@@ -178,12 +164,14 @@ gen dummy = 0
 
 ** Position variable to create space between groups
 gen pos=.
-replace pos=row if modelgroup==6
-replace pos=row+1 if modelgroup==5
-replace pos=row+2 if modelgroup==4
-replace pos=row+3 if modelgroup==3
-replace pos=row+4 if modelgroup==2
-replace pos=row+5 if modelgroup==1
+replace pos=row if modelgroup==7
+replace pos=row+1 if modelgroup==6
+replace pos=row+2 if modelgroup==5
+replace pos=row+3 if modelgroup==4
+replace pos=row+4 if modelgroup==3
+replace pos=row+5 if modelgroup==2
+replace pos=row+6 if modelgroup==1
+order modelgroup row pos
 
 summ pos
 loc maxpos = r(max)
@@ -199,44 +187,52 @@ twoway ///
 	(rspike ci95_lo ci95_hi pos if modelgroup == 1, horizontal color("`mycolor'%30") yaxis(1)) /// 95% CI
 	(rspike ci95_lo ci95_hi pos if modelgroup == 2, horizontal color(vermillion%50) yaxis(1)) /// 
 	(rspike ci95_lo ci95_hi pos if modelgroup == 3, horizontal color(orangebrown%50) yaxis(1)) /// 
-	(rspike ci95_lo ci95_hi pos if modelgroup == 4, horizontal color(eltblue%50) yaxis(1)) /// 
-	(rspike ci95_lo ci95_hi pos if modelgroup == 5, horizontal color(sea%50) yaxis(1)) /// 
-	(rspike ci95_lo ci95_hi pos if modelgroup == 6, horizontal color(navy%50) yaxis(1)) /// 
+	(rspike ci95_lo ci95_hi pos if modelgroup == 4, horizontal color(eltgreen%50) yaxis(1)) /// 
+	(rspike ci95_lo ci95_hi pos if modelgroup == 5, horizontal color(eltblue%50) yaxis(1)) /// 
+	(rspike ci95_lo ci95_hi pos if modelgroup == 6, horizontal color(sea%50) yaxis(1)) /// 
+	(rspike ci95_lo ci95_hi pos if modelgroup == 7, horizontal color(navy%50) yaxis(1)) /// 
 	(rspike ci90_lo ci90_hi pos if modelgroup == 1, horizontal color("`mycolor'%80") yaxis(1)) /// 90% CI
 	(rspike ci90_lo ci90_hi pos if modelgroup == 2, horizontal color(vermillion) yaxis(1)) ///
 	(rspike ci90_lo ci90_hi pos if modelgroup == 3, horizontal color(orangebrown) yaxis(1)) ///
-	(rspike ci90_lo ci90_hi pos if modelgroup == 4, horizontal color(eltblue) yaxis(1)) ///
-	(rspike ci90_lo ci90_hi pos if modelgroup == 5, horizontal color(sea) yaxis(1)) ///
-	(rspike ci90_lo ci90_hi pos if modelgroup == 6, horizontal color(navy) yaxis(1)) ///
+	(rspike ci90_lo ci90_hi pos if modelgroup == 4, horizontal color(eltgreen) yaxis(1)) ///
+	(rspike ci90_lo ci90_hi pos if modelgroup == 5, horizontal color(eltblue) yaxis(1)) ///
+	(rspike ci90_lo ci90_hi pos if modelgroup == 6, horizontal color(sea) yaxis(1)) ///
+	(rspike ci90_lo ci90_hi pos if modelgroup == 7, horizontal color(navy) yaxis(1)) ///
 	(pci 0 0 `maxpos' 0, lcolor(black) lwidth(medthick)) /// line at 0
 	(scatter pos beta if modelgroup == 1, mcolor("`mycolor'") yaxis(1) msymbol(circle) msize(medlarge)) /// 
 	(scatter pos beta if modelgroup == 2, mcolor(vermillion) yaxis(1) msymbol(circle) mfcolor(white) msize(medlarge)) /// 
 	(scatter pos beta if modelgroup == 3, mcolor(orangebrown) yaxis(1) msymbol(circle) mfcolor(white) msize(medlarge)) /// 
-	(scatter pos beta if modelgroup == 4, mcolor(eltblue) yaxis(1) msymbol(circle) mfcolor(white) msize(medlarge)) /// 
-	(scatter pos beta if modelgroup == 5, mcolor(sea) yaxis(1) msymbol(circle) mfcolor(white) msize(medlarge)) /// 
-	(scatter pos beta if modelgroup == 6, mcolor(navy) yaxis(1) msymbol(circle) mfcolor(white) msize(medlarge)) /// 
+	(scatter pos beta if modelgroup == 4, mcolor(eltgreen) yaxis(1) msymbol(circle) mfcolor(white) msize(medlarge)) /// 
+	(scatter pos beta if modelgroup == 5, mcolor(eltblue) yaxis(1) msymbol(circle) mfcolor(white) msize(medlarge)) /// 
+	(scatter pos beta if modelgroup == 6, mcolor(sea) yaxis(1) msymbol(circle) mfcolor(white) msize(medlarge)) ///
+	(scatter pos beta if modelgroup == 7, mcolor(navy) yaxis(1) msymbol(circle) mfcolor(white) msize(medlarge)) ///
 	, ///
-	yline(4 7 10 13 20, extend lstyle(foreground) lcolor(gs12)) /// 
+	yline(4 8 11 14 19 26, extend lstyle(foreground) lcolor(gs12)) /// 
 	legend(off) ///
 	xtitle("Effect of PM2.5 on suicides per 10,000", size(medsmall)) /// 
 	xlabel(, nogrid) ///
 	ytitle("") ///
-	ylabel(21 "{bf:Main specification}" /// 	spec 1
-		19 "Male: age 0-15" ///		spec 2		 
-		18 "Female: age 0-15" ///	
-		17 "Male: age 15-65" ///				
-		16 "Female: age 15-65" ///	
-		15 "Male: age 65_85" ///				 
-		14 "Female: age 65_85" ///	
-		12 "High avg. pollution" /// spec 3
-		11 "Low avg. pollution" ///
-		9 "Urban" /// spec 4
-		8 "Rural" /// 	
-		6 "Rich" /// spec 5
-		5 "Poor" ///
-		3 "High avg. suicide rate" /// 
+	ylabel(27 "{bf:Main specification}" /// 	spec 1
+		25 "Male: ages 0-15" ///		spec 2		 
+		24 "Female: ages 0-15" ///	
+		23 "Male: ages 15-65" ///				
+		22 "Female: ages 15-65" ///	
+		21 "Male: ages 65-85" ///				 
+		20 "Female: ages 65-85" ///	
+		18 "Spring" ///
+		17 "Summer" ///
+		16 "Fall" ///
+		15 "Winter" ///
+		13 "Urban" /// spec 4
+		12 "Rural" /// 	
+		10 "Rich" /// spec 5
+		9 "Poor" ///
+		7 "Low avg. PM2.5" /// 
+		6 "Mod. avg. PM2.5" /// spec 7
+		5 "High avg. PM2.5" /// 
+		3 "Low avg. suicide rate" /// 
 		2 "Mod. avg. suicide rate" /// spec 6
-		1 "Low avg. suicide rate" /// 
+		1 "High avg. suicide rate" /// 
 		, ///
 		angle(0) labsize(2.7) noticks nogrid) 
 	
