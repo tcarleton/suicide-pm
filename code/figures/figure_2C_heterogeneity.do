@@ -185,14 +185,17 @@ replace pos=row+3 if modelgroup==3
 replace pos=row+4 if modelgroup==2
 replace pos=row+5 if modelgroup==1
 
+summ pos
+loc maxpos = r(max)
+
 * main spec vertical line
 local x_line_main_spec = beta[_N] // beta main specification (last obs)
 local zeroline = 0
 
-
+* draft
 loc mycolor = "105 106 107" //"167 203 226"
 twoway /// 
-	(pci 0 `x_line_main_spec' 17 `x_line_main_spec', lcolor("`mycolor'") lwidth(thin) lp(shortdash)) /// line at main spec
+	(pci 0 `x_line_main_spec' `maxpos' `x_line_main_spec', lcolor("`mycolor'") lwidth(thin) lp(shortdash)) /// line at main spec
 	(rspike ci95_lo ci95_hi pos if modelgroup == 1, horizontal color("`mycolor'%30") yaxis(1)) /// 95% CI
 	(rspike ci95_lo ci95_hi pos if modelgroup == 2, horizontal color(vermillion%50) yaxis(1)) /// 
 	(rspike ci95_lo ci95_hi pos if modelgroup == 3, horizontal color(orangebrown%50) yaxis(1)) /// 
@@ -205,7 +208,7 @@ twoway ///
 	(rspike ci90_lo ci90_hi pos if modelgroup == 4, horizontal color(eltblue) yaxis(1)) ///
 	(rspike ci90_lo ci90_hi pos if modelgroup == 5, horizontal color(sea) yaxis(1)) ///
 	(rspike ci90_lo ci90_hi pos if modelgroup == 6, horizontal color(navy) yaxis(1)) ///
-	(pci 0 0 17 0, lcolor(black) lwidth(medthick)) /// line at 0
+	(pci 0 0 `maxpos' 0, lcolor(black) lwidth(medthick)) /// line at 0
 	(scatter pos beta if modelgroup == 1, mcolor("`mycolor'") yaxis(1) msymbol(circle) msize(medlarge)) /// 
 	(scatter pos beta if modelgroup == 2, mcolor(vermillion) yaxis(1) msymbol(circle) mfcolor(white) msize(medlarge)) /// 
 	(scatter pos beta if modelgroup == 3, mcolor(orangebrown) yaxis(1) msymbol(circle) mfcolor(white) msize(medlarge)) /// 
@@ -213,25 +216,28 @@ twoway ///
 	(scatter pos beta if modelgroup == 5, mcolor(sea) yaxis(1) msymbol(circle) mfcolor(white) msize(medlarge)) /// 
 	(scatter pos beta if modelgroup == 6, mcolor(navy) yaxis(1) msymbol(circle) mfcolor(white) msize(medlarge)) /// 
 	, ///
-	yline(3 6 9 13 16, extend lstyle(foreground) lcolor(gs12)) /// 
+	yline(4 7 10 13 20, extend lstyle(foreground) lcolor(gs12)) /// 
 	legend(off) ///
 	xtitle("Effect of PM2.5 on suicides per 10,000", size(medsmall)) /// 
 	xlabel(, nogrid) ///
 	ytitle("") ///
-	ylabel(17 "{bf:Main specification}" /// 	spec 1
-		15 "Male" ///				spec2        
-		14 "Female" ///
-		12 "Age 0-15" /// 	spec 3
-		11 "Age 15-65" ///
-		10 "Age 65-85" /// 	
-		8 "Polluted" /// spec 4
-		7 "Less polluted" ///
-		5 "Urban" /// spec 5
-		4 "Rural" /// 	
-		2 "Rich" /// spec 6
-		1 "Poor" /// 	
+	ylabel(21 "{bf:Main specification}" /// 	spec 1
+		19 "Male: age 0-15" ///		spec 2		 
+		18 "Female: age 0-15" ///	
+		17 "Male: age 15-65" ///				
+		16 "Female: age 15-65" ///	
+		15 "Male: age 65_85" ///				 
+		14 "Female: age 65_85" ///	
+		12 "High avg. pollution" /// spec 3
+		11 "Low avg. pollution" ///
+		9 "Urban" /// spec 4
+		8 "Rural" /// 	
+		6 "Rich" /// spec 5
+		5 "Poor" ///
+		3 "High avg. suicide rate" /// 
+		2 "Mod. avg. suicide rate" /// spec 6
+		1 "Low avg. suicide rate" /// 
 		, ///
 		angle(0) labsize(2.7) noticks nogrid) 
-	
 	
 graph export "$resdir/figures/figure_2C.pdf", replace	
