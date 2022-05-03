@@ -21,6 +21,7 @@ cd ~
 	global datadir "$root/main_2017"
 	global codedir "~/Dropbox/Works_in_progress/git_repos/suicide-pm"
 	global resdir "$codedir/results"
+	global sterdir "$codedir/results/ster"
 	cd $datadir
 	} 
 	else {
@@ -151,8 +152,66 @@ loc totcounties_ls = r(N)
 loc pctcounties_ls = (`totcounties_ls'/`totcounties')*100
 post stats ("no_cnties_lives_saved") ("no cnties saving lives") (`totcounties_ls') (.) (.)
 post stats ("pct_cnties_lives_saved") ("pct cnties saving lives") (`pctcounties_ls') (.) (.)
+restore
 
+**********************************************************************************				                                                         *
+* Percent of China's decline in the suicide rate attributable to improvements in air quality
+**********************************************************************************
 
-* XX% of china's average suicide rate decline is attribuatble to improvements in air quality 
+* load estimating sample 
+use data_winsorize, clear
+
+* compute detrended pollution for all in sample locations 
+egen uniqueccode = group(dsp_code)
+qui summ uniqueccode 
+gen pm25_detrended = .
+gen pm25_trend = .
+gen constant = .
+forvalues i = `r(min)'/`r(max)' {
+	qui summ pm25 if uniqueccode == `i'
+	if `r(N)' != 0 {
+		* starting week of sample for this county
+		qui summ week if uniqueccode == `i'
+		loc startwk = `r(min)'
+		* generate detrended variable
+		qui reg pm25 week if uniqueccode == `i'
+		replace pm25_detrended = pm25 - _b[week]*(week-`startwk') if uniqueccode == `i' & week>= `startwk'
+		replace pm25_trend = _b[week] if uniqueccode == `i' 
+		replace constant = _b[_cons] if uniqueccode == `i' 
+		di "Done with county # `i'"
+			} 
+		else {
+			di "No PM observations to run trend estimation with"
+			}
+	}
+
+* call estimates from main regression
+estimates use "$sterdir/winsor_p98_d24_rate_TINumD1.ster"
+estimates
+
+* predicted suicide rate with actual PM25
+predict yhat_actual 
+
+* predicted suicide rate with detrended PM25
+ren pm25 pm25_actual
+ren pm25_detrended pm25
+predict yhat_counterfactual
+
+summ yhat_actual, detail
+summ yhat_counterfactual, detail
+
+* trend in predicted suicides under actual pm25
+reg d24_rate week
+loc beta_raw = _b[week]
+reg yhat_actual week
+loc beta_actual = _b[week]
+reg yhat_counterfactual week
+loc beta_counterfactual = _b[week]
+
+* percent of trend due to pollution
+loc pct_trend_pm = (`beta_actual'-`beta_counterfactual'/`beta_raw')*100
+di `pct_trend_pm'
+
+post stats ("pct_decline_pm") ("pct CHN sui decline due to pm25") (`pct_trend_pm') (.) (.)
 
 postclose stats

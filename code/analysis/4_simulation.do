@@ -122,7 +122,9 @@ destring dsp_code, replace
 bysort dsp_code: egen firstweek = min(week)
 bysort dsp_code: gen pm25_hat_fw= pm25_hat if week==firstweek
 bysort dsp_code: replace pm25_hat_fw=pm25_hat_fw[_n-1] if pm25_hat_fw[_n-1]!=. 
-		
+
+gen yhat_actual = _b[pm25]*pm25
+gen yhat_counterfactual = _b[pm25]*pm25_detrended	
 gen yhat_diff = _b[pm25] *(pm25_hat_fw - pm25_hat)
 
 * interpretation of yhat_diff: this is the change in the weekly suicide rate in each 
