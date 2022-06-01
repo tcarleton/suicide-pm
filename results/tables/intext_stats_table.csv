@@ -1,0 +1,24 @@
+statname,details,stat,stat_se,stat_pval
+"totobs","total obs in est sample",139196,,
+"totcounties","total counties",597,,
+"pct_chg_chn_pm25","pct change in CHN avg PM25",-45.28166,,
+"pct_chg_chn_sui","pct change in CHN avg sui rate",-11.58072,,
+"avg_d24_rate","avg over sample",.9584258,1.592258,
+"avg_fd24_rate","avg over sample",.6995382,1.711012,
+"avg_md24_rate","avg over sample",1.036692,2.12971,
+"b_d24_rate","eff of 1 unit inc on sui rate",.00794,.0028866,.0063703
+"b_fd24_rate","eff of 1 unit inc on sui rate",.0064364,.0029693,.0311037
+"b_md24_rate","eff of 1 unit inc on sui rate",.0048231,.0032915,.1440607
+"bSD_d24_rate","eff of 1SD inc on suirate",.2389819,.0868816,.0063703
+"bSD_d24_rate_aspct","eff of 1SD inc on sui rate as pct avg",24.93484,,
+"bSD_fd24_rate","eff of 1SD inc on suirate",.1937252,.0893711,.0311037
+"bSD_fd24_rate_aspct","eff of 1SD inc on sui rate as pct avg",27.6933,,
+"bSD_md24_rate","eff of 1SD inc on suirate",.1451676,.09907,.1440607
+"bSD_md24_rate_aspct","eff of 1SD inc on sui rate as pct avg",14.00296,,
+"tot_lives_saved_CHN","total lives saved in CHN",45970.2,,
+"tot_lives_lost_CHN","total lives lost in CHN",-443.1939,,
+"tot_lives_saved_Binhai","total lives saved in Binhai",121.8272,,
+"tot_lives_saved_Wuhou","total lives saved in Wuhou",106.4694,,
+"no_cnties_lives_saved","no cnties saving lives",2374,,
+"pct_cnties_lives_saved","pct cnties saving lives",94.96,,
+"pct_decline_pm","pct CHN sui decline due to pm25",-10.27909,,

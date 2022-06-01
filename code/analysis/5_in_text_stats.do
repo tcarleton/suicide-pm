@@ -81,6 +81,17 @@ qui summ out
 post stats ("pct_chg_chn_pm25") ("pct change in CHN avg PM25") (`r(mean)') (.) (.)
 restore
 
+
+* On average across China, suicide rates have declined by XX% between 2013 and 2017
+preserve
+collapse (mean) d24_rate, by(week)
+qui reg d24_rate week 
+predict d24_rate_hat
+gen out = ((d24_rate_hat[_N]-d24_rate_hat[1])/d24_rate_hat[1])*100
+qui summ out
+post stats ("pct_chg_chn_sui") ("pct change in CHN avg sui rate") (`r(mean)') (.) (.)
+restore
+
 * average suicide rate across data
 foreach V of varlist d24_rate fd24_rate md24_rate {
 	qui summ `V'
@@ -215,3 +226,7 @@ di `pct_trend_pm'
 post stats ("pct_decline_pm") ("pct CHN sui decline due to pm25") (`pct_trend_pm') (.) (.)
 
 postclose stats
+
+* save csv
+use "$resdir/tables/intext_stats_table.dta", clear
+outsheet using "$resdir/tables/intext_stats_table.csv", comma replace

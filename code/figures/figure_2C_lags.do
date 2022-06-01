@@ -1,6 +1,6 @@
 **********************************************************************************
 
-* This script generates panel B of Figure 2 in Zhang et al.
+* This script generates panel C of Figure 2 in Zhang et al.
 
 * Data called by this script are assembled in 2_regression.do and 
 * 3_heterogeneity.do. 
@@ -103,6 +103,6 @@ tw ///
 	xlabel(-1 `" "Cumulative" "effect" "' 0 "0" 1 "1" 2 "2" 3 "3" 4 "4" 5 "5" 6 "6" 7 "7" 8 "8", nogrid) ///
 	legend(off) 
 	
-graph export "$resdir/figures/figure_2B.pdf", replace	
+graph export "$resdir/figures/figure_2C.pdf", replace	
 
 

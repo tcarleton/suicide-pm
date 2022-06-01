@@ -1,7 +1,7 @@
  
  **********************************************************************************
 
-* This script generates panel C of Figure 2 in Zhang et al.
+* This script generates panel B of Figure 2 in Zhang et al.
 
 * Data called by this script are assembled in 2_regression.do and 
 * 3_heterogeneity.do. 
@@ -180,6 +180,12 @@ loc maxpos = r(max)
 local x_line_main_spec = beta[_N] // beta main specification (last obs)
 local zeroline = 0
 
+* clip large SIs (state clipping in caption)
+foreach V of varlist ci90_hi ci90_lo ci95_hi ci95_lo {
+	replace `V' = -.01 if `V' < -.01
+	replace `V' = .05 if `V' >.05
+}
+
 * draft
 loc mycolor = "105 106 107" //"167 203 226"
 twoway /// 
@@ -207,6 +213,7 @@ twoway ///
 	(scatter pos beta if modelgroup == 6, mcolor(sea) yaxis(1) msymbol(circle) mfcolor(white) msize(medlarge)) ///
 	(scatter pos beta if modelgroup == 7, mcolor(navy) yaxis(1) msymbol(circle) mfcolor(white) msize(medlarge)) ///
 	, ///
+	xscale(r(-.01 .05)) xlabel(-0.01(.01).05) ///
 	yline(4 8 11 14 19 26, extend lstyle(foreground) lcolor(gs12)) /// 
 	legend(off) ///
 	xtitle("Effect of PM2.5 on suicides per 10,000", size(medsmall)) /// 
@@ -236,4 +243,4 @@ twoway ///
 		, ///
 		angle(0) labsize(2.7) noticks nogrid) 
 	
-graph export "$resdir/figures/figure_2C.pdf", replace	
+graph export "$resdir/figures/figure_2B.pdf", replace	
