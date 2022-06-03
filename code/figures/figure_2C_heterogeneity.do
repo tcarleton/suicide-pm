@@ -1,7 +1,7 @@
  
  **********************************************************************************
 
-* This script generates panel B of Figure 2 in Zhang et al.
+* This script generates panel C of Figure 2 in Zhang et al.
 
 * Data called by this script are assembled in 2_regression.do and 
 * 3_heterogeneity.do. 
@@ -216,7 +216,7 @@ twoway ///
 	xscale(r(-.01 .05)) xlabel(-0.01(.01).05) ///
 	yline(4 8 11 14 19 26, extend lstyle(foreground) lcolor(gs12)) /// 
 	legend(off) ///
-	xtitle("Effect of PM2.5 on suicides per 10,000", size(medsmall)) /// 
+	xtitle("Effect of PM2.5 on weekly suicides per 1 million", size(medsmall)) /// 
 	xlabel(, nogrid) ///
 	ytitle("") ///
 	ylabel(27 "{bf:Main specification}" /// 	spec 1
@@ -243,4 +243,4 @@ twoway ///
 		, ///
 		angle(0) labsize(2.7) noticks nogrid) 
 	
-graph export "$resdir/figures/figure_2B.pdf", replace	
+graph export "$resdir/figures/figure_2C.pdf", replace	

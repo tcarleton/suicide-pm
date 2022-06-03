@@ -104,7 +104,7 @@ tw  line d24_rate `smooth', lcolor(black%80) lpattern(solid) lwidth(medthick) ya
 	lfitci pm25 `smooth', lcolor(eltblue) lpattern(solid) lwidth(medthick) yaxis(2) fcolor(eltblue%60)   alwidth(none) ///
 	legend(order(1 "Suicide rate" 4 "PM2.5")) ///
 	ylabel(, nogrid) xlabel(, nogrid) ///
-	ytitle("Weekly suicide rate (per 10,000)", axis(1)) ///
+	ytitle("Weekly suicide rate per 1 million", axis(1)) ///
 	ytitle("PM2.5 (ug/m3)", axis(2)) xtitle("Date")	
 	
 graph export "$resdir/figures/figure_1B_`smooth'.pdf", replace	

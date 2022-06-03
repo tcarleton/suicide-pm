@@ -225,6 +225,26 @@ di `pct_trend_pm'
 
 post stats ("pct_decline_pm") ("pct CHN sui decline due to pm25") (`pct_trend_pm') (.) (.)
 
+**********************************************************************************				                                                         *
+* Percent of global suicides that take place in China
+**********************************************************************************
+
+use "$datadir/who_suicide/suiciderate_adm0_2000_2019.dta", clear
+
+// global average suicide rate = 9 per 100,000
+loc globalsui2019 = 9*(7700000000)/100000
+
+// china
+summ suiciderate_tot if iso=="CHN" & year==2019
+loc chinarate2019 = r(mean)
+loc chinasui2019 = `chinarate2019'*(1398000000)/100000
+
+// share
+loc sharechina = `chinasui2019'/`globalsui2019'
+di `sharechina'
+
+post stats ("pct_global_sui_chn") ("pct of global suicides in china in 2019") (`sharechina') (.) (.)
+
 postclose stats
 
 * save csv

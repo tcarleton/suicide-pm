@@ -269,10 +269,13 @@ loc xmax = r(N)
 di `xmax'
 drop if rank>`xmax'
 
-twoway (dropline lives_saved_tot rank if top_pop==0, msymbol(smcircle) mcolor(gs8) msize(tiny) /// format of grey dots
-		lwidth(vthin) lpattern(solid) lcolor("236 133 95%80")) /// format of vertical lines/bars (area under graph)
-		(dropline lives_saved_tot rank if top_pop==1, mlabel(dspname_Eng) mlabv(pos) mlabsize(vsmall) msymbol(diamond) mcolor(gs8) msize(medium) mlcolor(black) /// 
-		lwidth(vthin) lpattern(solid) lcolor("236 133 95%80")) /// format of vertical lines/bars (area under graph)
+loc mycolorgreen = "11 78 68"
+loc mycolortan = "201 152 76"
+
+twoway (dropline lives_saved_tot rank if top_pop==0, msymbol(smcircle) mcolor("`mycolortan'") msize(tiny) /// format of grey dots
+		lwidth(vthin) lpattern(solid) lcolor("`mycolorgreen'"%80)) /// format of vertical lines/bars (area under graph)
+		(dropline lives_saved_tot rank if top_pop==1, mlabel(dspname_Eng) mlabv(pos) mlabsize(vsmall) msymbol(diamond) mcolor(white) msize(medium) mlcolor("`mycolortan'") /// 
+		lwidth(vthin) lpattern(solid) lcolor("`mycolortan'%80")) /// format of vertical lines/bars (area under graph)
 		, ///
 		ytitle("Total avoided suicides per county: 2013-2017")  ///
 		xtitle("Counties by rank order of avoided suicides") ///
@@ -280,6 +283,6 @@ twoway (dropline lives_saved_tot rank if top_pop==0, msymbol(smcircle) mcolor(gs
 		xscale(r(0 `xmax') noextend) 	/// 
 		legend(off) 		
 		
-graph export "$resdir/figures/Fig3A_rankorder.pdf", replace
+graph export "$resdir/figures/Fig3B_rankorder.pdf", replace
 
 

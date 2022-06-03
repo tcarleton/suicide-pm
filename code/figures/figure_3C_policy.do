@@ -3,7 +3,7 @@
 * This script computes how many suicides have been avoided due to stated
 * policy goals and actual policy impacts on air pollution in a key set of 
 * Chinese cities, using results from Ma et al. (2019). 
-* Results from this script are shown in Figure 3B.
+* Results from this script are shown in Figure 3C.
 
 * This script calls regression results from code/analysis/2_regression.do. 
 * All suicide and population data are proprietary and were accessed under 
@@ -41,60 +41,25 @@ set scheme plotplain
 ** new population data
 *---------------------------*
 
-use "$datadir/pop/pop_new.dta", clear
+import excel "$datadir/pop/pop.xlsx", sheet("Sheet1") firstrow clear
+
+keep Year Beijing11 Jingjinji YRD PRD
+
+xpose, clear
+
+* Keep average population in the four regions
+ren v6 avg_pop
+keep avg_pop
+drop in 1
+
+gen region = "Beijing" in 1
+replace region = "Jingjinji" in 2
+replace region = "YRD" in 3
+replace region = "PRD"  in 4
 
 // convert population to total levels (currently in units of 10,000)
-gen pop_tot = pop*10000
-
-sort county_id_pop year
-
-* ma et al: 2013-2017 pollution declines
-keep if year>=2013 & year<=2017
-
-xtset county_id_pop year
-
-* extract the first 2 digits of the county code to identify regions
-tostring county_id_pop, replace
-gen firstdigits=substr(county_id_pop,1,2)
-destring firstdigits, replace
-
-****** Region dummies
-
-* Beijing
-gen beijing=(firstdigits==11)
-
-* Yangtze River Delta
-gen yrd=(firstdigits==31 | firstdigits==32 | firstdigits==33 | firstdigits==34)
-
-* Pearl River Delta
-gen prd=(firstdigits==44)
-
-*  Jingjinji (note that it includes Beijing)
-gen jingjinji= (firstdigits==11 | firstdigits==12 | firstdigits==13) 
-
-* Compute average population in each region over the 2013-2017 period
-gen insample_ma = (beijing==1 | yrd==1 | prd ==1 | jingjinji==1)
-keep if insample_ma
-bysort county_id_pop: egen avpop_tot = mean(pop_tot)
-collapse (mean) avpop_tot beijing yrd prd jingjinji, by(county_id_pop)
-
-* have to compute sums this way because there is not a 1:1 mapping from counties to regions
-egen avpop_beijing = sum(avpop_tot) if beijing==1
-egen avpop_yrd = sum(avpop_tot) if yrd==1
-egen avpop_prd = sum(avpop_tot) if prd==1
-egen avpop_jing = sum(avpop_tot) if jingjinji==1
-
-* collapse
-drop avpop_tot
-collapse (min) avpop_*
-
-* reshape
-xpose, clear
-ren v1 avg_pop
-gen region = "Beijing" in 1
-replace region = "YRD" in 2
-replace region = "PRD" in 3
-replace region = "Jingjinji" in 4
+gen av_pop_tot = avg_pop*10000
+drop avg_pop
 
 tempfile popdata
 save "`popdata'", replace
@@ -111,7 +76,6 @@ ren ïregion region_order
 ren region_name region
 
 merge 1:1 region using  "`popdata'"
-
 drop _merge
 
 * percent decrease variables are in decimals
@@ -132,17 +96,17 @@ forvalues i=1/2 {
 label var pm25_dec_1 "pm 2.5 decrease goal"
 label var pm25_dec_2 "pm 2.5 decrease actual"
 
-tempfile maetal
-save "`maetal'", replace
+* Made some adjustment to direct save as pmpop_maetal and merge with suicide data
+ren region region_name
+ren region_order region
+
+save "$datadir/intermediate/pmpop_maetal.dta", replace
 
 *---------------------------*
 ** Calculate the number of suicides avoided
 ** due to overall downward trends for all
 ** districts in the Ma et al regions
 *---------------------------*
-
-** START EDITING HERE: NEEDS TO BE UPDATED WITH NEW POP DATA ABOVE
-** POSSIBLY NEED TO CHANGE THE ABOVE STEPS TO USE COUNTY_ID_POL?? **
 
 use "data_winsorize.dta", clear
 
@@ -184,15 +148,6 @@ gen jingjinji= (firstdigits==11 | firstdigits==12 | firstdigits==13)
 gen insample_ma = (beijing==1 | yrd==1 | prd ==1 | jingjinji==1)
 keep if insample_ma
 bysort dsp_code year: egen totsui = sum(suicides)
-collapse (mean) avpop_tot beijing yrd prd jingjinji, by(county_id_pop)
-
-* have to compute sums this way because there is not a 1:1 mapping from counties to regions
-egen avpop_beijing = sum(avpop_tot) if beijing==1
-egen avpop_yrd = sum(avpop_tot) if yrd==1
-egen avpop_prd = sum(avpop_tot) if prd==1
-egen avpop_jing = sum(avpop_tot) if jingjinji==1
-
-
 
 * Region
 gen region=.
@@ -297,9 +252,9 @@ format prop_suic_diff_`i' prop_suic_13_`i'  %12.0f
 
 }
 
-* drop PRD because it has a much smaller population than other regions and ~zero lives saved
-drop if region==2
-drop region_name
+* I'm not sure whether to drop PRD with new population data so I keeped it for now.
+* drop if region==2
+* drop region_name
 
 reshape long pm25_dec_ pm25_pdec_ lives_ prop_suic_diff_ prop_suic_13_, i(region) j(data)
 
@@ -312,22 +267,22 @@ gen n=_n
 
 gen pos=.
 replace pos=n if region==1
-replace pos=n+1 if region==3
-replace pos=n+2 if region==4
+replace pos=n+1 if region==2
+replace pos=n+2 if region==3
+replace pos=n+3 if region==4
+
+loc mycolorgreen = "11 78 68"
+loc mycolortan = "201 152 76"
 
 
-twoway (bar lives pos if data==1, lcolor(vermillion) fcolor(vermillion%50) lwidth(medthick)) ///
-       (bar lives pos if data==2, lcolor(eltblue) fcolor(eltblue%50) lwidth(medthick)) ///
-	   (scatter lives pos if data==1, m(i) mlabel(prop_suic_diff_) mlabposition(12)) ///
-	   (scatter lives pos if data==2, m(i) mlabel(prop_suic_diff_) mlabposition(12)) , ///
+twoway (bar prop_suic_diff_ pos if data==1, lcolor("`mycolortan'") fcolor("`mycolortan'"%50) lwidth(medthick)) ///
+       (bar prop_suic_diff_ pos if data==2, lcolor("`mycolorgreen'") fcolor("`mycolorgreen'"%50) lwidth(medthick)) ///
+	   (scatter prop_suic_diff_ pos if data==1, m(i)  mlabposition(12)) ///
+	   (scatter prop_suic_diff_ pos if data==2, m(i)  mlabposition(12)) , ///
        legend(order(1 "policy goal" 2 "actual")) ///
-       xlabel( 1.5 "YRD" 4.5 "Jingjinji" 7.5 "Beijing", noticks nogrid) ///
+       xlabel(1.5 "Yellow River Delta" 4.5 "Pearl River Delta{superscript:*}" 7.5 "Jingjinji" 10.5 "Beijing", noticks nogrid) ///
 	   xsca(noline) ///
-       xtitle("Region", size(small)) ytitle("Total avoided suicides due to pollution control policies: 2013-2017", size(small)) ///
-	   note("Note: The number on top of each column represents lives saved as a percentage of the observed 2013-2017 suicide decline", size(vsmall) )
-	   
-** need to check suicide decline number, especially in Beijing and Jingjinji where some counties had missing suicide information
-* alternatively, we could use % of suicides in 2013 (prop_suic_13_)
-	 
-graph export "$resdir/figures/Fig3B_maetal.pdf", replace	 
+       xtitle("", size(small)) ytitle("Percentage of suicide rate decline due to" "pollution control policies: 2013-2017", size(small)) ///
+	   note("{superscript:*} Pearl River Delta experienced a ~20% increase in suicide rates from 2013 to 2017", size(vsmall))
 
+graph export "$resdir/figures/Fig3C_maetal.pdf", replace	 

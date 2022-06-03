@@ -1,6 +1,6 @@
 **********************************************************************************
 
-* This script generates panel C of Figure 2 in Zhang et al.
+* This script generates panel D of Figure 2 in Zhang et al.
 
 * Data called by this script are assembled in 2_regression.do and 
 * 3_heterogeneity.do. 
@@ -97,12 +97,12 @@ tw ///
 	(sc b lag if lag>=0,  mcolor("60 122 183") msymbol(circle) mfcolor(white) msize(medlarge)), /// 
 	xline(-0.5, lcolor(gs6) lpattern(solid)) ///
 	yline(0, lcolor(gs12) lpattern(shortdash)) ///
-	ytitle("Effect of thermal inversions on suicides per 10,000", margin(zero)) ///
+	ytitle("Effect of thermal inversions on" "weekly suicides per 1 million", margin(zero)) ///
 	xtitle("lag (weeks)") ylabel(, nogrid) ///
 	xscale(r(-1.5 8)) ///
 	xlabel(-1 `" "Cumulative" "effect" "' 0 "0" 1 "1" 2 "2" 3 "3" 4 "4" 5 "5" 6 "6" 7 "7" 8 "8", nogrid) ///
 	legend(off) 
 	
-graph export "$resdir/figures/figure_2C.pdf", replace	
+graph export "$resdir/figures/figure_2D.pdf", replace	
 
 
