@@ -245,6 +245,23 @@ di `sharechina'
 
 post stats ("pct_global_sui_chn") ("pct of global suicides in china in 2019") (`sharechina') (.) (.)
 
+**********************************************************************************				                                                         *
+* Global average suicide stats
+**********************************************************************************
+
+use "$datadir/who_suicide/collapsed_suiciderate_adm0.dta", clear
+
+* average rate in 2000 (per 1 million)
+summ globalmn_suirate if year == 2000
+loc globalsui2000 = r(mean)
+
+* average rate in 2019
+summ globalmn_suirate if year == 2019
+loc globalsui2019 = r(mean)
+
+post stats ("global_sui_rate_2000") ("global average suicide rate 2000") (`globalsui2000') (.) (.)
+post stats ("global_sui_rate_2019") ("global average suicide rate 2019") (`globalsui2019') (.) (.)
+
 postclose stats
 
 * save csv

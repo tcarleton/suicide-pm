@@ -102,6 +102,9 @@ di `oecdpctchange'
 di `lowmidincpctchange'
 di "pct difference in trend lowinc to oecd: " (`lowmidincpctchange'-`oecdpctchange')/`oecdpctchange'
 di `lowmidincpctchange'/`oecdpctchange'
+
+// save for use in in-text stats
+save "$datadir/who_suicide/collapsed_suiciderate_adm0.dta", replace
 	
 // how many countries have declining sui rate?
 		

@@ -23,3 +23,5 @@ statname,details,stat,stat_se,stat_pval
 "pct_cnties_lives_saved","pct cnties saving lives",94.96,,
 "pct_decline_pm","pct CHN sui decline due to pm25",-10.27909,,
 "pct_global_sui_chn","pct of global suicides in china in 2019",.1627974,,
+"global_sui_rate_2000","global average suicide rate 2000",115.6049,,
+"global_sui_rate_2019","global average suicide rate 2019",94.5153,,

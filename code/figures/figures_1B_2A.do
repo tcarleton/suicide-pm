@@ -160,7 +160,7 @@ tw  rspike upper lower groupnum, color("236 133 95") lwidth(thick) || sc beta gr
 	legend(order(2 "point estimate" 1 "95% confidence interval"))
 	
 	
-graph export "$resdir/figures/figure_1C.pdf", replace	
+graph export "$resdir/figures/figure_2A.pdf", replace	
 
 **********************************************************************************
 * Figure 1C alternative: Main inversion instrument linear relationship with PM                                            
