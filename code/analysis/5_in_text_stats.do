@@ -127,6 +127,24 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
 	post stats ("bSD_`V'_aspct") ("eff of 1SD inc on sui rate as pct avg") (`aspct') (.) (.)
 }
 
+****** repeat for women aged 65-85, as they are shown to be the most sensitive 
+loc avg_f65_85d24_rate =  1.944099 // avg sui rate for this group, calculated from 3_heterogeneity.do
+	
+estimates use "$resdir/ster/winsor_p`pp'_f65_85d24_rate_TINumD1.ster" 
+
+* effect of 1 mug/m^3 increase
+local t = _b[pm25]/_se[pm25]
+local p =2*ttail(e(df_r),abs(`t'))
+post stats ("b_f65_85d24_rate") ("eff of 1 unit inc on sui rate") (_b[pm25]) (_se[pm25]) (`p')
+	
+* effect per SD	
+lincom _b[pm25]*`within_sd'
+post stats ("bSD_f65_85d24_rate") ("eff of 1SD inc on suirate") (r(estimate)) (r(se)) (r(p))
+	
+* pct above average rate
+loc aspct = (r(estimate)/`avg_f65_85d24_rate')*100
+post stats ("bSD_f65_85d24_rate_aspct") ("eff of 1SD inc on sui rate as pct avg") (`aspct') (.) (.)
+
 **********************************************************************************				                                                         *
 * Simulation effect sizes
 **********************************************************************************

@@ -15,6 +15,9 @@ statname,details,stat,stat_se,stat_pval
 "bSD_fd24_rate_aspct","eff of 1SD inc on sui rate as pct avg",27.6933,,
 "bSD_md24_rate","eff of 1SD inc on suirate",.1451676,.09907,.1440607
 "bSD_md24_rate_aspct","eff of 1SD inc on sui rate as pct avg",14.00296,,
+"b_f65_85d24_rate","eff of 1 unit inc on sui rate",.0408104,.0150486,.007141
+"bSD_f65_85d24_rate","eff of 1SD inc on suirate",1.228326,.4529371,.007141
+"bSD_f65_85d24_rate_aspct","eff of 1SD inc on sui rate as pct avg",63.18226,,
 "tot_lives_saved_CHN","total lives saved in CHN",45970.2,,
 "tot_lives_lost_CHN","total lives lost in CHN",-443.1939,,
 "tot_lives_saved_Binhai","total lives saved in Binhai",121.8272,,
