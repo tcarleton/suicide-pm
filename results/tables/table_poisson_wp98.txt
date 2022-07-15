@@ -1,0 +1,11 @@
+		(1)	(2)	(3)
+VARIABLES	LABELS	d24_rate	fd24_rate	md24_rate
+				
+pm25	PM2.5	0.0078***	0.0071*	0.0044
+		(0.0026)	(0.0037)	(0.0031)
+				
+Observations		137,194	130,326	133,877
+County FE		X	X	X
+Week-of-sample FE		X	X	X
+Robust standard errors in parentheses				
+*** p<0.01, ** p<0.05, * p<0.1				

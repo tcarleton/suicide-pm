@@ -1,13 +1,13 @@
 		(1)	(2)	(3)	(4)
 VARIABLES	LABELS	d24_rate	d24_rate	d24_rate	d24_rate
 					
-pm25	PM2.5	0.009***	0.008***	0.008***	0.008***
-		(0.003)	(0.003)	(0.003)	(0.003)
+pm25	PM2.5	0.0091***	0.0082***	0.0079***	0.0075***
+		(0.0032)	(0.0029)	(0.0029)	(0.0027)
 					
 Observations		139,240	139,196	139,196	139,199
-R-squared		-0.017	-0.012	-0.011	-0.009
-IV		TINumD1	TINumD1	TINumD1	TINumD1
-Weather		No	Linear	Quadratic	Bins
-FE		County FE and Week FE	County FE and Week FE	County FE and Week FE	County FE and Week FE
+R-squared		-0.0169	-0.0124	-0.0111	-0.0088
+County FE		X	X	X	X
+Week-of-sample FE		X	X	X	X
+Weather		None	Linear	Quadratic	Binned
 KP Test		33.15	41.27	41.84	54.43
 p-value		2.29e-07	1.32e-08	1.61e-08	3.60e-10

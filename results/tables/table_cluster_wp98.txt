@@ -1,14 +1,13 @@
 		(1)	(2)	(3)	(4)
 VARIABLES	LABELS	d24_rate	d24_rate	d24_rate	d24_rate
 					
-pm25	PM2.5	0.008***	0.008***	0.008***	0.008***
-		(0.002)	(0.002)	(0.003)	(0.003)
+pm25	PM2.5	0.0079***	0.0079***	0.0079***	0.0079***
+		(0.0023)	(0.0024)	(0.0028)	(0.0029)
 					
 Observations		139,196	139,196	139,196	139,196
-R-squared		-0.011	-0.011	-0.011	-0.011
-IV		TINumD1	TINumD1	TINumD1	TINumD1
-Weather		Quadratic	Quadratic	Quadratic	Quadratic
-FE		County FE and Week FE	County FE and Week FE	County FE and Week FE	County FE and Week FE
-Clustering		No	Week	County	County and week
+R-squared		-0.0111	-0.0111	-0.0111	-0.0111
+County FE		X	X	X	X
+Week-of-sample FE		X	X	X	X
+Clustering		None	Week	County	County and week
 KP Test		961.7	57.88	125.7	41.84
 p-value		0	0	0	1.61e-08

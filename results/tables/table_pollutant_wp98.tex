@@ -1,0 +1,32 @@
+\documentclass[]{article}
+\setlength{\pdfpagewidth}{8.5in} \setlength{\pdfpageheight}{11in}
+\begin{document}
+\begin{tabular}{lccccccc} \hline
+ & (1) & (2) & (3) & (4) & (5) & (6) & (7) \\
+VARIABLES & d24\_rate & d24\_rate & d24\_rate & d24\_rate & d24\_rate & d24\_rate & d24\_rate \\ \hline
+ &  &  &  &  &  &  &  \\
+aqi & 0.0062*** &  &  &  &  &  &  \\
+ & (0.0022) &  &  &  &  &  &  \\
+pm25 &  & 0.0079*** &  &  &  &  &  \\
+ &  & (0.0029) &  &  &  &  &  \\
+o3 &  &  & 0.0174** &  &  &  &  \\
+ &  &  & (0.0071) &  &  &  &  \\
+pm10 &  &  &  & 0.0047*** &  &  &  \\
+ &  &  &  & (0.0017) &  &  &  \\
+so2 &  &  &  &  & 0.0261** &  &  \\
+ &  &  &  &  & (0.0123) &  &  \\
+no2 &  &  &  &  &  & 0.0170*** &  \\
+ &  &  &  &  &  & (0.0059) &  \\
+co &  &  &  &  &  &  & 0.1922 \\
+ &  &  &  &  &  &  & (0.1403) \\
+ &  &  &  &  &  &  &  \\
+Observations & 139,196 & 139,196 & 139,196 & 139,196 & 139,196 & 139,196 & 139,196 \\
+R-squared & -0.0094 & -0.0111 & -0.0320 & -0.0092 & -0.0617 & -0.0076 & -0.7405 \\
+County FE & X & X & X & X & X & X & X \\
+Week-of-sample FE & X & X & X & X & X & X & X \\
+KP Test & 54.29 & 41.84 & 16.57 & 70.87 & 9.029 & 89.15 & 2.465 \\
+ p-value & 4.58e-10 & 1.61e-08 & 0.000171 & 0 & 0.00304 & 0 & 0.118 \\ \hline
+\multicolumn{8}{c}{ Robust standard errors in parentheses} \\
+\multicolumn{8}{c}{ *** p$<$0.01, ** p$<$0.05, * p$<$0.1} \\
+\end{tabular}
+\end{document}
