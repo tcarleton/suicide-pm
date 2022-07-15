@@ -49,6 +49,8 @@ gen `V'2=`V'^2
 global control2 ///
 tem_ave pre-prs tem_ave2 pre2-prs2
 
+label var pm25 "PM2.5" 
+
 save data_winsorize, replace
 
 
@@ -140,14 +142,16 @@ cap erase "$resdir/tables/table_first_wp`pp'.txt"
 
 keep if d24_rate !=. & pm25 !=. & TINumD1 !=. & tem_ave !=. & pre !=. & ssd !=. & win !=. & rhu !=. & prs !=. 
 
+label var TINumD1 "No. of inversions"
+label var TIStrD1 "Inversion strength ($^\circ$C)" 
+label var TIIndD1 "No. days with inversion"
+
 foreach V of varlist TINumD1 TIStrD1 TIIndD1 {
 
-ivreghdfe pm25 `V' $control2, absorb(dsp_code week) cluster(dsp_code week)
-tab year if e(sample)
+reghdfe pm25 `V' $control2, absorb(dsp_code week) cluster(dsp_code week)
 outreg2 using "`outfile'", label tex(frag) ///
-append ctitle(pm25) dec(4) ///
-keep(`V') ///
-addtext(County FE, Yes, Week FE, Yes, Clustering: County and week, Yes)
+append dec(3) nonotes keep(`V') nocons ///
+addtext(County FE, Yes, Week FE, Yes)
 }
 *
 
@@ -164,27 +168,30 @@ loc outfile = "$resdir/tables/table_iv_wp`pp'.tex"
 cap erase "$resdir/tables/table_iv_wp`pp'.tex"
 cap erase "$resdir/tables/table_iv_wp`pp'.txt"
 
+label var pm25 "PM2.5"
 
 foreach A of varlist TINumD1 TIIndD1 TIStrD1 {
-foreach V of varlist d24_rate fd24_rate md24_rate {
+	foreach V of varlist fd24_rate md24_rate {
 	
- loc outfilester "$resdir/ster/winsor_p`pp'_`V'_`A'.ster"
+		loc outfilester "$resdir/ster/winsor_p`pp'_`V'_`A'.ster"
 
-  ivreghdfe `V' $control2 (pm25=`A'), absorb(dsp_code week) cluster(dsp_code week) 
+		ivreghdfe `V' $control2 (pm25=`A'), absorb(dsp_code week) cluster(dsp_code week) 
   
-  * save estimates from main model for use in figures
-  estimates save "`outfilester'", replace
+		* save estimates from main model for use in figures
+		estimates save "`outfilester'", replace
+		}
+	
+	* table for paper just calls total suicide rate
+	loc outfilester "$resdir/ster/winsor_p`pp'_d24_rate_`A'.ster"
+	ivreghdfe d24_rate $control2 (pm25=`A'), absorb(dsp_code week) cluster(dsp_code week) 
+	estimates save "`outfilester'", replace
   
-  outreg2 using "`outfile'", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep(pm25) ///
-  addstat(KP Test,e(widstat), p-value, e(idp)) ///
-  addtext(IV, `A', Weather, Quadratic, FE, County FE and Week FE, Clustering, County and week)
-  
-}
-}
-*
-
+	  outreg2 using "`outfile'", label tex(frag) ///
+	  append dec(3) ///
+	  keep(pm25) nocons nonotes ///
+	  addstat(KP Test,e(widstat), p-value, e(idp)) ///
+	  addtext(IV, `A', Weather, Quadratic, FE, County FE and Week FE)
+  }
 
 **********************************************************************************
 *						                                                         *
@@ -198,15 +205,16 @@ loc outfile = "$resdir/tables/table_main_wp`pp'.tex"
 cap erase "$resdir/tables/table_main_wp`pp'.tex"
 cap erase "$resdir/tables/table_main_wp`pp'.txt"
 
+label var pm25 "PM2.5" 
 
 foreach V of varlist d24_rate fd24_rate md24_rate {
 
   ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week)
   outreg2 using "`outfile'", label tex(frag) ///
-  append ctitle(`V': IV) dec(4) ///
-  keep(pm25) ///
+  append ctitle(`V': IV) dec(3) ///
+  keep(pm25) nocons nonotes ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
-  addtext(County FE, Yes, Week FE, Yes, Clustering: County and week, Yes)
+  addtext(County FE, Yes, Week FE, Yes)
   
   loc outfilester "$resdir/ster/winsor_p`pp'_`V'_OLS.ster"
    
@@ -215,9 +223,9 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
   estimates save "`outfilester'", replace
   
   outreg2 using "`outfile'", label tex(frag) ///
-  append ctitle(`V': FE) dec(4) ///
-  keep(pm25) ///
-  addtext (County FE, Yes, Week FE, Yes, Clustering: County and week, Yes)
+  append ctitle(`V': FE) dec(3) ///
+  keep(pm25) nocons nonotes ///
+  addtext (County FE, Yes, Week FE, Yes)
 }
 
 *
@@ -234,16 +242,17 @@ loc outfile = "$resdir/tables/table_cluster_wp`pp'.tex"
 cap erase "$resdir/tables/table_cluster_wp`pp'.tex"
 cap erase "$resdir/tables/table_cluster_wp`pp'.txt"
 
+
 *** no clustering
 
-foreach V of varlist d24_rate fd24_rate md24_rate {
+foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_clNone.ster"
   
   ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) 
   estimates save "`outfilester'", replace
   outreg2 using "`outfile'", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep(pm25) ///
+  append ctitle(`V') dec(3) ///
+  keep(pm25) nocons nonotes ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
   addtext(IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE, Clustering, No)
   
@@ -252,13 +261,13 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
 
 *** cluster by week 
 
-foreach V of varlist d24_rate fd24_rate md24_rate {
+foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_clWeek.ster"
   ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(week)
   estimates save "`outfilester'", replace
   outreg2 using "`outfile'", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep(pm25) ///
+  append ctitle(`V') dec(3) ///
+  keep(pm25) nocons nonotes ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
   addtext(IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE, Clustering, Week)
   
@@ -267,13 +276,13 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
 
 *** cluster by county
 
-foreach V of varlist d24_rate fd24_rate md24_rate {
+foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_clCounty.ster"
   ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code)
   estimates save "`outfilester'", replace
   outreg2 using "`outfile'", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep(pm25) ///
+  append ctitle(`V') dec(3) ///
+  keep(pm25) nocons nonotes ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
   addtext(IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE, Clustering, County)
   
@@ -282,11 +291,11 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
 
 *** cluster by county and week (PREFERRED)
 
-foreach V of varlist d24_rate fd24_rate md24_rate {
+foreach V of varlist d24_rate {
   ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week)
   outreg2 using "`outfile'", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep(pm25) ///
+  append ctitle(`V') dec(3) ///
+  keep(pm25) nocons nonotes ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
   addtext(IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE, Clustering, County and week)
   
@@ -317,58 +326,58 @@ tem_ave_pbin* pre_pbin10-prs_pbin100
 
 *** no weather controls
 
-foreach V of varlist d24_rate fd24_rate md24_rate {
+foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_noWeather.ster"
   ivreghdfe `V' (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) 
   estimates save "`outfilester'", replace
   outreg2 using "`outfile'", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep(pm25) ///
+  append ctitle(`V') dec(3) ///
+  keep(pm25) nocons nonotes ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
-  addtext(IV, TINumD1, Weather, No, FE, County FE and Week FE, Clustering, County and week)
+  addtext(IV, TINumD1, Weather, No, FE, County FE and Week FE)
   
 }
 *
 
 *** weather linear
 
-foreach V of varlist d24_rate fd24_rate md24_rate {
+foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_linWeather.ster"
   ivreghdfe `V' $control (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) 
   estimates save "`outfilester'", replace
   outreg2 using "`outfile'", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep(pm25) ///
+  append ctitle(`V') dec(3) ///
+  keep(pm25) nocons nonotes ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
-  addtext(IV, TINumD1, Weather, Linear, FE, County FE and Week FE, Clustering, County and week)
+  addtext(IV, TINumD1, Weather, Linear, FE, County FE and Week FE)
   
 }
 *
 
 *** weather quadratic (PREFERRED)
 
-foreach V of varlist d24_rate fd24_rate md24_rate {
+foreach V of varlist d24_rate  {
   ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week)
   outreg2 using "`outfile'", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep(pm25) ///
+  append ctitle(`V') dec(3) ///
+  keep(pm25) nocons nonotes ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
-  addtext(IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE, Clustering, County and week)
+  addtext(IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE)
   
 }
 *
 
 *** weather bins 
 
-foreach V of varlist d24_rate fd24_rate md24_rate {
+foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_binWeather.ster"
   ivreghdfe `V' $control_bins (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) 
   estimates save "`outfilester'", replace
   outreg2 using "`outfile'", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep(pm25) ///
+  append ctitle(`V') dec(3) ///
+  keep(pm25) nocons nonotes ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
-  addtext(IV, TINumD1, Weather, Bins, FE, County FE and Week FE, Clustering, County and week)
+  addtext(IV, TINumD1, Weather, Bins, FE, County FE and Week FE)
   
 }
 *
@@ -389,44 +398,44 @@ cap erase "$resdir/tables/table_fe_wp`pp'.txt"
 
 *** county and week fe (PREFERRED)
 
-foreach V of varlist d24_rate fd24_rate md24_rate {
+foreach V of varlist d24_rate  {
 
   ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week)
   outreg2 using "`outfile'", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep(pm25) ///
+  append ctitle(`V') dec(3) ///
+  keep(pm25) nocons nonotes ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
-  addtext(IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE, Clustering, County and week)
+  addtext(IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE)
   
 }
 *
 
 *** county-year and week fe
 
-foreach V of varlist d24_rate fd24_rate md24_rate {
+foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_cYwFE.ster"
   ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code#year week) cluster(dsp_code week)
   estimates save "`outfilester'", replace
   outreg2 using "`outfile'", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep(pm25) ///
+  append ctitle(`V') dec(3) ///
+  keep(pm25) nocons nonotes ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
-  addtext(IV, TINumD1, Weather, Quadratic, FE, County-year FE and Week FE, Clustering, County and week)
+  addtext(IV, TINumD1, Weather, Quadratic, FE, County-year FE and Week FE)
   
 }
 *
 
 *** county-month and week fe
 
-foreach V of varlist d24_rate fd24_rate md24_rate {
+foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_cMwFE.ster"
   ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code#month week) cluster(dsp_code week)
   estimates save "`outfilester'", replace
   outreg2 using "`outfile'", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep(pm25) ///
+  append ctitle(`V') dec(3) ///
+  keep(pm25) nocons nonotes ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
-  addtext(IV, TINumD1, Weather, Quadratic, FE, County-month FE and Week FE, Clustering, County and week)
+  addtext(IV, TINumD1, Weather, Quadratic, FE, County-month FE and Week FE)
   
 }
 *
@@ -440,15 +449,15 @@ forvalues i=1(1)31{
 }
 *
 
-foreach V of varlist d24_rate fd24_rate md24_rate {
+foreach V of varlist d24_rate {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_provTFE.ster"
   ivreghdfe `V' $control2 provt* (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week)
   estimates save "`outfilester'", replace
   outreg2 using "`outfile'", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep(pm25) ///
+  append ctitle(`V') dec(3) ///
+  keep(pm25) nocons nonotes ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
-  addtext(IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE and Province trend, Clustering, County and week)
+  addtext(IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE and Province trend)
   
 }
 *
@@ -462,16 +471,16 @@ forvalues i=1(1)161{
 }
 *
 
-foreach V of varlist d24_rate fd24_rate md24_rate {
+foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_counTFE.ster"
   ivreghdfe `V' $control2 countyt* (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week)
   estimates save "`outfilester'", replace
   outreg2 using "`outfile'", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep(pm25) ///
+  append ctitle(`V') dec(3) ///
+  keep(pm25) nocons nonotes ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///
-  addtext(IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE and County trend, Clustering, County and week)
-  
+  addtext(IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE and County trend)
+ 
 }
 *
 
@@ -505,21 +514,24 @@ foreach V of varlist pm25 TINumD1 $control2 {
 }
 *
 
-cap erase "table_lag_wp`pp'.tex"
-cap erase "table_lag_wp`pp'.txt"
+cap erase "$resdir/tables/table_lag_wp`pp'.tex"
+cap erase "$resdir/tables/table_lag_wp`pp'.txt"
 
-foreach V of varlist d24_rate fd24_rate md24_rate {
+loc outfile = "$resdir/tables/table_lag_wp`pp'.tex"
+
+
+foreach V of varlist d24_rate {
 foreach i of numlist 1/10 {
   loc outfilester "$resdir/ster/winsor_p`pp'_`V'_lag`i'.ster"
   ivreghdfe `V' ///
   tem_ave*_ave`i' pre*_ave`i' ssd*_ave`i' win*_ave`i' rhu*_ave`i' prs*_ave`i' /// 
   (pm25_ave`i'=TINumD1_ave`i'), absorb(dsp_code week) cluster(dsp_code week)
   estimates save "`outfilester'", replace
-  outreg2 using "table_lag_wp`pp'.tex", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep(pm25_ave`i') ///
+  outreg2 using "`outfile'", label tex(frag) ///
+  append ctitle(`V') dec(3) ///
+  keep(pm25_ave`i') nocons nonotes ///
   addstat(KP Test,e(widstat), p-value, e(idp)) ///   
-  addtext(IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE, Clustering, County and week)
+  addtext(IV, TINumD1, Weather, Quadratic, FE, County FE and Week FE)
 }
 }
 *
@@ -531,8 +543,10 @@ foreach i of numlist 1/10 {
 
 use data_winsorize, clear
 
-cap erase "table_lag_reduce_wp`pp'.tex"
-cap erase "table_lag_reduce_wp`pp'.txt"
+cap erase "$resdir/tables/table_lag_reduce_wp`pp'.tex"
+cap erase "$resdir/tables/table_lag_reduce_wp`pp'.txt"
+
+loc outfile = "$resdir/tables/table_lag_reduce_wp`pp'.tex"
 
 tsset dsp_code week
 
@@ -543,7 +557,7 @@ foreach V of varlist $control2 TINumD1 {
 }
 *
 
-foreach V of varlist d24_rate fd24_rate md24_rate {
+foreach V of varlist d24_rate {
 
 *** 1 lag
 
@@ -555,9 +569,9 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
-  outreg2 using "table_lag_reduce_wp`pp'.tex", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep (TINumD1*) ///
+  outreg2 using "`outfile'", label tex(frag) ///
+  append ctitle(`V') dec(3) ///
+  keep (TINumD1*) nocons nonotes ///
   addtext (sum, `b', sum_se, `se', sum_t, `t')
 
 *** 2 lag
@@ -570,9 +584,9 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
-  outreg2 using "table_lag_reduce_wp`pp'.tex", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep (TINumD1*) ///
+  outreg2 using "`outfile'", label tex(frag) ///
+  append ctitle(`V') dec(3) ///
+  keep (TINumD1*) nocons nonotes ///
   addtext (sum, `b', sum_se, `se', sum_t, `t')
 
 *** 3 lag
@@ -585,9 +599,9 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
-  outreg2 using "table_lag_reduce_wp`pp'.xls", ///
-  append ctitle(`V') dec(4) ///
-  keep (TINumD1*) ///
+ outreg2 using "`outfile'", label tex(frag) ///
+  append ctitle(`V') dec(3) ///
+  keep (TINumD1*) nocons nonotes ///
   addtext (sum, `b', sum_se, `se', sum_t, `t')
 
 *** 4 lag
@@ -600,9 +614,9 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
-  outreg2 using "table_lag_reduce_wp`pp'.tex", label tex(frag)  ///
-  append ctitle(`V') dec(4) ///
-  keep (TINumD1*) ///
+  outreg2 using "`outfile'", label tex(frag)  ///
+  append ctitle(`V') dec(3) ///
+  keep (TINumD1*) nocons nonotes ///
   addtext (sum, `b', sum_se, `se', sum_t, `t')
   
 *** 5 lag
@@ -615,9 +629,9 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
-  outreg2 using "table_lag_reduce_wp`pp'.tex", label tex(frag)  ///
-  append ctitle(`V') dec(4) ///
-  keep (TINumD1*) ///
+  outreg2 using "`outfile'", label tex(frag)  ///
+  append ctitle(`V') dec(3) ///
+  keep (TINumD1*) nocons nonotes ///
   addtext (sum, `b', sum_se, `se', sum_t, `t')
   
   *** 6 lag
@@ -630,9 +644,9 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
-  outreg2 using "table_lag_reduce_wp`pp'.tex", label tex(frag)  ///
-  append ctitle(`V') dec(4) ///
-  keep (TINumD1*) ///
+  outreg2 using "`outfile'", label tex(frag)  ///
+  append ctitle(`V') dec(3) ///
+  keep (TINumD1*) nocons nonotes ///
   addtext (sum, `b', sum_se, `se', sum_t, `t')
   
   *** 7 lag
@@ -645,9 +659,9 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
-  outreg2 using "table_lag_reduce_wp`pp'.tex", label tex(frag)  ///
-  append ctitle(`V') dec(4) ///
-  keep (TINumD1*) ///
+  outreg2 using "`outfile'", label tex(frag)  ///
+  append ctitle(`V') dec(3) ///
+  keep (TINumD1*) nocons nonotes ///
   addtext (sum, `b', sum_se, `se', sum_t, `t')
   
   *** 8 lag (save for figure - 2 months based on previous PM lit)
@@ -661,9 +675,9 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
-  outreg2 using "table_lag_reduce_wp`pp'.tex", label tex(frag)  ///
-  append ctitle(`V') dec(4) ///
-  keep (TINumD1*) ///
+  outreg2 using "`outfile'", label tex(frag)  ///
+  append ctitle(`V') dec(3) ///
+  keep (TINumD1*) nocons nonotes ///
   addtext (sum, `b', sum_se, `se', sum_t, `t')
   
   *** 9 lag
@@ -676,9 +690,9 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
-  outreg2 using "table_lag_reduce_wp`pp'.tex", label tex(frag)  ///
-  append ctitle(`V') dec(4) ///
-  keep (TINumD1*) ///
+  outreg2 using "`outfile'", label tex(frag)  ///
+  append ctitle(`V') dec(3) ///
+  keep (TINumD1*) nocons nonotes ///
   addtext (sum, `b', sum_se, `se', sum_t, `t')
   
   *** 10 lag
@@ -691,9 +705,9 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
-  outreg2 using "table_lag_reduce_wp`pp'.tex", label tex(frag) ///
-  append ctitle(`V') dec(4) ///
-  keep (TINumD1*) ///
+  outreg2 using "`outfile'", label tex(frag) ///
+  append ctitle(`V') dec(3) ///
+  keep (TINumD1*) nocons nonotes ///
   addtext (sum, `b', sum_se, `se', sum_t, `t')
 
 }

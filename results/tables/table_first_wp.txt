@@ -1,0 +1,19 @@
+		(1)	(2)	(3)
+VARIABLES	LABELS	ug/m3	ug/m3	ug/m3
+				
+TINumD1	inversion number using layers 1 and 2: times	0.5127***		
+		(0.0793)		
+TIStrD1	inversion strength using layers 1 and 2: celsius		1.5090***	
+			(0.2743)	
+TIIndD1	inversion days using layers 1 and 2: days			0.7544***
+				(0.1302)
+Constant	Constant	387.8719**	369.1662**	383.7325**
+		(155.4803)	(156.3585)	(155.6344)
+				
+Observations		139,196	139,196	139,196
+R-squared		0.6730	0.6724	0.6720
+County FE		Yes	Yes	Yes
+Week FE		Yes	Yes	Yes
+Clustering: County and week		Yes	Yes	Yes
+Robust standard errors in parentheses				
+*** p<0.01, ** p<0.05, * p<0.1				
