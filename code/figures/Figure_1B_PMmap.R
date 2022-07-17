@@ -229,4 +229,4 @@ ggplot() +
         axis.text = element_blank(),
         legend.position = "bottom",
         strip.background = element_rect(fill="white", size=1.5),
-        strip.text.x = element_text(size = 10)); ggsave(file.path("results","figures","Figure_1A_PMmap.png"), width = 20, height = 20, units = "cm")
+        strip.text.x = element_text(size = 10)); ggsave(file.path("results","figures","Figure_1B_PMmap.png"), width = 20, height = 20, units = "cm")

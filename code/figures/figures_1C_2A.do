@@ -1,7 +1,7 @@
 
 **********************************************************************************
 
-* This script generates panel B of Figure 1 and panel A of Figure 2 in Zhang et al.
+* This script generates panel C of Figure 1 and panel A of Figure 2 in Zhang et al.
 
 * Data called by this script are assembled in code/clean/1_merge.do. All suicide 
 * and population data are proprietary and were accessed under user agreements 
@@ -40,7 +40,7 @@ gen modate = mofd(date)
 preserve
 
 **********************************************************************************
-* Figure 1B: Trend in suicide over time		                                                  
+* Figure 1C: Trend in suicide over time		                                                  
 **********************************************************************************
 
 // smooth by week (raw data) or month (avg across month)?
@@ -107,7 +107,7 @@ tw  line d24_rate `smooth', lcolor(black%80) lpattern(solid) lwidth(medthick) ya
 	ytitle("Weekly suicide rate per 1 million", axis(1)) ///
 	ytitle("PM2.5 (ug/m3)", axis(2)) xtitle("Date")	
 	
-graph export "$resdir/figures/figure_1B_`smooth'.pdf", replace	
+graph export "$resdir/figures/figure_1C_`smooth'.pdf", replace	
 
 **********************************************************************************
 * Figure 1C: Pollution and Inversions                                            
@@ -162,39 +162,3 @@ tw  rspike upper lower groupnum, color("236 133 95") lwidth(thick) || sc beta gr
 	
 graph export "$resdir/figures/figure_2A.pdf", replace	
 
-**********************************************************************************
-* Figure 1C alternative: Main inversion instrument linear relationship with PM                                            
-**********************************************************************************
-use data_winsorize, clear
-global control2 ///
-pre-prs pre2-prs2
-
-keep if d24_rate !=. & pm25 !=. & TINumD1 !=. & tem_ave !=. & pre !=. & ssd !=. & win !=. & rhu !=. & prs !=. 
-
-
-* residualize
-reghdfe pm25 $control2, absorb(dsp_code week) cluster(dsp_code week)
-
-
-reghdfe pm25 TINumD1 $control2, absorb(dsp_code week) cluster(dsp_code week)
-
-
-
-loc mmin = 0
-loc mmax = 20
-loc omit = 10
-loc obs = `mmax'-`mmin'
-
-drop if _n>0	
-keep pm25 TINumD1
-loc obsr = round(`obs') +1
-
-set obs `obsr'
-replace TINumD1 = _n + `mmin' +1 
-
-predictnl that = _b[TINumD1]*(TINumD1-`omit'), ci(lower upper)
-
-tw rarea upper lower TINumD1, color("60 122 183%60") || line that TINumD1, lpattern(solid) lcolor("60 122 183") lwidth(medthick) ///
-	yline(0, lwidth(vthin) lcolor(gs9) lpattern(shortdash)) ylabel(,nogrid) xlabel(,nogrid) ///
-	xtitle("Number of inversions per week") ytitle("Weekly average PM2.5 (ug/m3)") legend(off)
-graph export "$resdir/figures/figure_1C_alternate.pdf", replace	
