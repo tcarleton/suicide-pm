@@ -128,6 +128,42 @@ sum TI*
 sum tem_ave_pbin10-tem_ave_pbin100
 sum tem_ave-prs 
 
+*********************************************************************************				                                                    
+* Export summary stats to latex table
+**********************************************************************************
+
+use data_winsorize, clear
+
+qui ivreghdfe d24_rate $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) 
+keep if e(sample)
+
+est clear  // clear the est locals
+
+estpost tabstat d24_rate fd24_rate md24_rate pm25 TINumD1 tem_ave pre ssd win rhu prs, c(stat) stat(mean sd min max)
+
+
+label var d24_rate "Total weekly suicide rate (per 1 mil.)"
+label var fd24_rate "Female weekly suicide rate (per 1 mil.)"
+label var md24_rate "Male weekly suicide rate (per 1 mil.)"
+label var TINumD1 "Weekly number of inversions"
+
+label var tem_ave "Daily average temperature (C)"
+label var pre "Daily precipitation (mm)" 
+label var ssd  "Daily average sunshine duration (h)"
+label var win  "Daily average wind speed (m/s)"
+label var rhu "Daily average relative humidity (\%)"
+label var prs "Daily average barometric pressure (hpa)"
+
+
+esttab, ///
+ cells("mean(fmt(%13.2fc)) sd(fmt(%13.2fc)) min max") nonumber ///
+  nomtitle nonote noobs label collabels("Mean" "SD" "Min" "Max")
+  
+esttab using "$resdir/tables/summstats.tex", replace ////
+ cells("mean(fmt(%13.2fc)) sd(fmt(%13.2fc)) min max") nonumber ///
+  nomtitle nonote noobs label booktabs f ///
+  collabels("Mean" "SD" "Min" "Max")
+
 **********************************************************************************
 *						                                                         *
 * first stage                               *
@@ -190,7 +226,7 @@ foreach A of varlist TINumD1 TIStrD1 TIIndD1  {
 	  append dec(4) ///
 	  keep(pm25) nocons nonotes ///
 	  addstat(KP Test,e(widstat), p-value, e(idp)) ///
-	  addtext(IV, `A', County FE, X, Week-of-sample FE, Yes)
+	  addtext(IV, `A', County FE, X, Week-of-sample FE, X)
   }
 
 **********************************************************************************
