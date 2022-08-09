@@ -759,6 +759,8 @@ addtext(County FE, X, Week-of-sample FE, X)
 * outlined by Lin and Wooldridge (2017). The original article can be found here: http://www.weilinmetrics.com/uploads/5/1/4/0/51404393/nonlinear_panel_cre_endog_20170309.pdf	
 * This statalist discussion also discusses implementation details: https://www.statalist.org/forums/forum/general-stata-discussion/general/1381373-ivpoisson-with-panel-data-fixed-effects		                        */   
 
+loc pp = 98
+
 use data_winsorize, clear
 
 cap erase "$resdir/tables/table_poisson_wp`pp'.tex"
@@ -781,4 +783,45 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
 
 }
 
+// Point estimates above are correct, but we need to bootstrap SEs over this two step processs
+cap drop *resid*
+capture program drop mypoisson
+
+program define mypoisson, rclass
+	cap drop *resid*
+	qui reghdfe pm25 $control2 TINumD1, absorb(dsp_code week) residuals(pm25_resid)
+	qui ppmlhdfe d24_rate pm25 pm25_resid $control2, a(dsp_code week) vce(cluster dsp_code)
+	local beta_all = _b[pm25]
+	qui ppmlhdfe fd24_rate pm25 pm25_resid $control2, a(dsp_code week) vce(cluster dsp_code)
+	local beta_f = _b[pm25]
+	qui ppmlhdfe md24_rate pm25 pm25_resid $control2, a(dsp_code week) vce(cluster dsp_code)
+	local beta_m = _b[pm25]
+	
+	ereturn clear
+		
+	return scalar betaALL = `beta_all'
+	return scalar betaF = `beta_f'
+	return scalar betaM = `beta_m'
+
+end
+
+bootstrap all=r(betaALL) fem=r(betaF) male=r(betaM), reps(100) nodrop cluster(dsp_code) idcluster(newid) group(dsp_code): mypoisson
+
+// store results
+matrix betas = e(b)
+matrix SEs = e(se)
+
+// save results 
+svmat double betas , name(betas)
+svmat double SEs, name(ses)
+keep if _n==1
+keep betas* ses*
+ren betas1 betas_ALL
+ren betas2 betas_FEM
+ren betas3 betas_MALE
+ren ses1 ses_ALL
+ren ses2 ses_FEM
+ren ses3 ses_MALE
+
+outsheet using "$resdir/tables/table_poisson_wp`pp'_bootstrap.csv", comma replace
 
