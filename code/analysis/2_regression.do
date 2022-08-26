@@ -576,7 +576,7 @@ foreach i of numlist 1/10 {
 *						                                                         *
 * Dynamics: distributed lag model using reduced form
 **********************************************************************************
-
+loc pp = 98
 use data_winsorize, clear
 
 cap erase "$resdir/tables/table_lag_reduce_wp`pp'.tex"
@@ -599,7 +599,7 @@ foreach i of numlist 1/8 {
 *
 
 foreach V of varlist d24_rate {
-
+  
 *** 1 lag
 
   reghdfe `V' TINumD1 tem_ave pre-prs tem_ave2-prs2 *lag1, ///
