@@ -21,8 +21,13 @@ cd ~
 
 use data_winsorize, clear
 
+* dates
+gen date = mdy(month, day ,year)
+gen weekdate = wofd(date)
+gen modate = mofd(date)
+
 * collapse to avg by date
-collapse (mean) d24_rate fd24_rate md24_rate aqi pm* [aw=t_dsppop], by(year month week)
+collapse (mean) d24_rate fd24_rate md24_rate aqi pm* [aw=t_dsppop], by(weekdate month year)
 
 * plot
 set scheme s1color
@@ -35,13 +40,13 @@ generate lower = 0.5
 * gen spring dummy
 gen spring = (month==4 | month==5 | month==6)
 
-format week %tm
+format weekdate %tw
 
 * plot
-twoway line md24_rate week, color(black) ytitle("Weekly suicide rate per 1 million") ///
- || line fd24_rate week, color(emerald)  || rarea lower upper week if spring==1 & year==2013, color(gs12%60)  ///
- || rarea lower upper week if spring==1 & year==2014, color(gs12%60)  || rarea lower upper week if spring==1 & year==2015, color(gs12%60) ///
- || rarea lower upper week if spring==1 & year==2016, color(gs12%60) || rarea lower upper week if spring==1 & year==2017, color(gs12%60) ///
+twoway line md24_rate weekdate, color(black) ytitle("Weekly suicide rate per 1 million") ///
+ || line fd24_rate weekdate, color(emerald)  || rarea lower upper weekdate if spring==1 & year==2013, color(gs12%60)  ///
+ || rarea lower upper weekdate if spring==1 & year==2014, color(gs12%60)  || rarea lower upper weekdate if spring==1 & year==2015, color(gs12%60) ///
+ || rarea lower upper weekdate if spring==1 & year==2016, color(gs12%60) || rarea lower upper weekdate if spring==1 & year==2017, color(gs12%60) ///
  legend(order(1 "Male" 2 "Female" 3 "Spring months"))
 graph export "$resdir/figures/supp_fig_seasonality.pdf", replace	
 	
