@@ -206,7 +206,7 @@ cap erase "$resdir/tables/table_iv_wp`pp'.txt"
 
 label var pm25 "PM2.5"
 
-foreach A of varlist TINumD1 TIStrD1 TIIndD1  {
+foreach A of varlist TINumD1 TIStrD1 TIIndD1  { // can add other thermal layers: TINumD2 TIStrD2 TIIndD2
 	foreach V of varlist fd24_rate md24_rate {
 	
 		loc outfilester "$resdir/ster/winsor_p`pp'_`V'_`A'.ster"
@@ -228,6 +228,7 @@ foreach A of varlist TINumD1 TIStrD1 TIIndD1  {
 	  addstat(KP Test,e(widstat), p-value, e(idp)) ///
 	  addtext(IV, `A', County FE, X, Week-of-sample FE, X)
   }
+
 
 **********************************************************************************
 *						                                                         *
