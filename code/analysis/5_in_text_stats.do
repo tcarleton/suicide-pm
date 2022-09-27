@@ -116,6 +116,8 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
 * use within-location SD 
 loneway pm25 dsp_code
 loc within_sd = r(sd_w)
+
+post stats ("SD_PM25") ("within county SD in PM25") (`within_sd') (.) (.) 
 	
 foreach V of varlist d24_rate fd24_rate md24_rate {
 	qui ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) 
