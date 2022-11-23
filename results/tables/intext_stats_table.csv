@@ -9,6 +9,7 @@ statname,details,stat,stat_se,stat_pval
 "b_d24_rate","eff of 1 unit inc on sui rate",.00794,.0028866,.0063703
 "b_fd24_rate","eff of 1 unit inc on sui rate",.0064364,.0029693,.0311037
 "b_md24_rate","eff of 1 unit inc on sui rate",.0048231,.0032915,.1440607
+"SD_PM25","within county SD in PM25",30.09833,,
 "bSD_d24_rate","eff of 1SD inc on suirate",.2389819,.0868816,.0063703
 "bSD_d24_rate_aspct","eff of 1SD inc on sui rate as pct avg",24.93484,,
 "bSD_fd24_rate","eff of 1SD inc on suirate",.1937252,.0893711,.0311037
@@ -18,6 +19,14 @@ statname,details,stat,stat_se,stat_pval
 "b_f65_85d24_rate","eff of 1 unit inc on sui rate",.0408104,.0150486,.007141
 "bSD_f65_85d24_rate","eff of 1SD inc on suirate",1.228326,.4529371,.007141
 "bSD_f65_85d24_rate_aspct","eff of 1SD inc on sui rate as pct avg",63.18226,,
+"totobs_WHO","total obs in WHO sample",3660,,
+"totCntrs_WHO","total countries in WHO sample",183,,
+"totCbtrs_WHO_OECD","total countries in WHO sample OECD",26,,
+"totCbtrs_WHO_LMI","total countries in WHO sample LMI",129,,
+"totobs_PM","total county-day obs in PM25 sample",4657217,,
+"totCnts_PM","total counties in PM25 sample",2785,,
+"totobs_sim","total obs in simulation",708050,,
+"totCnts_sim","total counties in simulation",2500,,
 "tot_lives_saved_CHN","total lives saved in CHN",45970.2,,
 "tot_lives_lost_CHN","total lives lost in CHN",-443.1939,,
 "tot_lives_saved_Binhai","total lives saved in Binhai",121.8272,,

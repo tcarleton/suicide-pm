@@ -73,6 +73,7 @@ gen weather = "quadWeather"
 gen outliers = "winsor_p98" 
 gen beta = _b[pm25] if modelgroup==1
 gen se = _se[pm25] if modelgroup==1
+gen inobs = e(N) if modelgroup==1
 
 
 // loop over male/female by agelist
@@ -83,6 +84,7 @@ foreach sex in "`sexagelist'" {
 	replace modelgroup = 2 in `i'
 	replace beta = _b[pm25] in `i'
 	replace se = _se[pm25] in `i'
+	replace inobs = e(N) in `i'
 	loc i = `i'+1
 }
 
@@ -95,6 +97,7 @@ foreach seas in "`seasonlist'" {
 	replace modelgroup = 3  in `i'
 	replace beta = _b[pm25] in `i'
 	replace se = _se[pm25] in `i'
+	replace inobs = e(N) in `i'
 	loc i = `i'+1
 }
 
@@ -107,6 +110,7 @@ foreach urban in "`urbanlist'" {
 	replace modelgroup = 4  in `i'
 	replace beta = _b[pm25] in `i'
 	replace se = _se[pm25] in `i'
+	replace inobs = e(N) in `i'
 	loc i = `i'+1
 }
 
@@ -120,6 +124,7 @@ foreach income in "`incomelist'" {
 	replace modelgroup = 5  in `i'
 	replace beta = _b[pm25] in `i'
 	replace se = _se[pm25] in `i'
+	replace inobs = e(N) in `i'
 	loc i = `i'+1
 }
 
@@ -133,6 +138,7 @@ foreach terc in "`avgPM25list'" {
 	replace modelgroup = 6  in `i'
 	replace beta = _b[pm25] in `i'
 	replace se = _se[pm25] in `i'
+	replace inobs = e(N) in `i'
 	loc i = `i'+1
 }
 
@@ -146,6 +152,7 @@ foreach terc in "`avgsuilist'" {
 	replace modelgroup = 7  in `i'
 	replace beta = _b[pm25] in `i'
 	replace se = _se[pm25] in `i'
+	replace inobs = e(N) in `i'
 	loc i = `i'+1
 }
 
@@ -241,6 +248,28 @@ twoway ///
 		2 "Mod. avg. suicide rate" /// spec 6
 		1 "High avg. suicide rate" /// 
 		, ///
-		angle(0) labsize(2.7) noticks nogrid) 
+		angle(0) labsize(2.7) noticks nogrid) ///
+		text(27 0.045 "n=139,196"  ///
+			25 0.045 "n=141,793" ///
+			24 0.045 "n=141,793" ///
+			23 0.045 "n=139,169" ///
+			22 0.045 "n=139,115" ///
+			21 0.045 "n=139,036" ///
+			20 0.045 "n=138,987" ///
+			18 0.045 "n=34,794" ///
+			17 0.045 "n=34,973" ///
+			16 0.045 "n=35,469" ///
+			15 0.045 "n=33,960" ///
+			13 0.045 "n=49,924" ///
+			12 0.045 "n=89,272" ///
+			10 0.045 "n=59,117" ///
+			9 0.045 "n=80,079" ///
+			7 0.045 "n=44,053" ///
+			6 0.045 "n=48,391" ///
+			5 0.045 "n=46,796" ///
+			3 0.045 "n=45,477" ///
+			2 0.045 "n=47,947" ///
+			1 0.045 "n=45,772" ///
+			, place(e) size(small)) 
 	
 graph export "$resdir/figures/figure_2C.pdf", replace	

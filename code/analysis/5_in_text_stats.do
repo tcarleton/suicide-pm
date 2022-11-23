@@ -148,10 +148,86 @@ loc aspct = (r(estimate)/`avg_f65_85d24_rate')*100
 post stats ("bSD_f65_85d24_rate_aspct") ("eff of 1SD inc on sui rate as pct avg") (`aspct') (.) (.)
 
 **********************************************************************************				                                                         *
+* WHO sample data descriptions
+**********************************************************************************
+
+use "$datadir/who_suicide/suiciderate_adm0_2000_2019.dta", clear
+preserve
+
+* total N
+count 
+post stats ("totobs_WHO") ("total obs in WHO sample") (`r(N)') (.) (.)
+
+* total countries in WHO
+collapse (mean) suiciderate_tot, by(iso)
+count
+post stats ("totCntrs_WHO") ("total countries in WHO sample") (`r(N)') (.) (.)
+
+* total countries by group
+// OECD list
+clear
+insheet using "$datadir/who_suicide/oecd.csv"
+replace iso="IRL" if iso=="IRE" // inconsistent with WHOd
+tempfile oecd
+save "`oecd'", replace
+
+// WB low and middle income
+clear
+import excel using "$datadir/who_suicide/CLASS.xls", sheet("Groups") firstrow
+keep if GroupCode=="LMY" 
+ren CountryCode iso
+gen lowmidinc=1
+tempfile class
+save "`class'", replace
+
+restore
+merge m:1 iso using "`oecd'"
+replace oecd=0 if _merge==1
+drop _merge
+
+merge m:1 iso using "`class'"
+tab _merge
+drop if _merge==2 // small countries not in WHO
+replace lowmidinc = 0 if _merge==1
+drop _merge
+
+collapse (mean) suiciderate_tot, by(iso oecd lowmidinc)
+
+count if oecd==1
+post stats ("totCbtrs_WHO_OECD") ("total countries in WHO sample OECD") (`r(N)') (.) (.)
+
+count if lowmidinc==1
+post stats ("totCbtrs_WHO_LMI") ("total countries in WHO sample LMI") (`r(N)') (.) (.)
+
+**********************************************************************************				                                                         *
+* PM25 data description
+**********************************************************************************
+
+use "$datadir/pollution_county_daily_2013_2018.dta", clear
+count if year<2018 & pm25!=.
+post stats ("totobs_PM") ("total county-day obs in PM25 sample") (`r(N)') (.) (.)
+
+collapse (mean) pm25, by(county_id)
+count if pm25!=.
+post stats ("totCnts_PM") ("total counties in PM25 sample") (`r(N)') (.) (.)
+
+**********************************************************************************				                                                         *
 * Simulation effect sizes
 **********************************************************************************
 
 use "$datadir/lives_saved.dta", clear
+
+* total number of county-week observations
+count if lives_saved!=.
+post stats ("totobs_sim") ("total obs in simulation") (`r(N)') (.) (.)
+
+* total counties 
+preserve
+qui summ week if lives_saved !=.
+keep if week==`r(max)'
+count
+post stats ("totCnts_sim") ("total counties in simulation") (`r(N)') (.) (.)
+restore
 
 * overall, air quality improvements in China have avoided XX suicides and PM increases have caused YY suicides 
 preserve

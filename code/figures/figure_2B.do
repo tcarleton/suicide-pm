@@ -65,6 +65,7 @@ gen weather = "quadWeather"
 gen outliers = "winsor_p98" 
 gen beta = _b[pm25] if modelgroup==1
 gen se = _se[pm25] if modelgroup==1
+gen inobs = e(N) if modelgroup==1
 
 // loop over FEs
 loc i = 2
@@ -74,6 +75,7 @@ foreach fe in "`felist'" {
 	replace modelgroup = 2 in `i'
 	replace beta = _b[pm25] in `i'
 	replace se = _se[pm25] in `i'
+	replace inobs = e(N) in `i'
 	loc i = `i'+1
 }
 
@@ -86,6 +88,7 @@ foreach we in "`weatherlist'" {
 	replace modelgroup = 3  in `i'
 	replace beta = _b[pm25] in `i'
 	replace se = _se[pm25] in `i'
+	replace inobs = e(N) in `i'
 	loc i = `i'+1
 }
 
@@ -99,6 +102,7 @@ foreach cl in "`cluslist'" {
 	replace modelgroup = 4 in `i'
 	replace beta = _b[pm25] in `i'
 	replace se = _se[pm25] in `i'
+	replace inobs = e(N) in `i'
 	loc i = `i'+1
 }
 
@@ -111,6 +115,7 @@ foreach iv in "`instlist'" {
 	replace modelgroup = 5 in `i'
 	replace beta = _b[pm25] in `i'
 	replace se = _se[pm25] in `i'
+	replace inobs = e(N) in `i'
 	loc i = `i'+1
 }
 
@@ -166,7 +171,11 @@ twoway ///
 		2 "Inversion days inst." ///
 		1 "Inversion strength inst." /// 	spec 5
 		, ///
-		angle(0) labsize(2.7) noticks ) 
+		angle(0) labsize(2.7) noticks ) ///
+		text(13 0.014 "n=139,196"  ///
+			10 0.014 "n=139,110" ///
+			8 0.014 "n=139,199"  6 0.014 "n=139,240", place(e) size(small)) 
+		
 	
 	
 graph export "$resdir/figures/figure_2B.pdf", replace	

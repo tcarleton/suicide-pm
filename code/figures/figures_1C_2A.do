@@ -110,7 +110,7 @@ tw  line d24_rate `smooth', lcolor(black%80) lpattern(solid) lwidth(medthick) ya
 graph export "$resdir/figures/figure_1C_`smooth'.pdf", replace	
 
 **********************************************************************************
-* Figure 1C: Pollution and Inversions                                            
+* Figure 2A: Pollution and Inversions                                            
 **********************************************************************************
 
 * first stage 
