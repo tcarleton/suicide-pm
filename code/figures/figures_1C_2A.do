@@ -139,11 +139,17 @@ drop pm25
 gen beta = .
 gen lower = .
 gen upper = .
+gen ci90_lo = .
+gen ci90_hi = .
 
 foreach V in "TINumD1" "TIStrD1" "TIIndD1" {
 	replace beta = `b_`V'' if group=="`V'"
 	replace lower = beta-1.96*`se_`V'' if group=="`V'"
 	replace upper = beta+1.96*`se_`V'' if group=="`V'"
+	
+	replace ci90_lo = beta-1.645*`se_`V'' if group=="`V'"
+	replace ci90_hi = beta+1.645*`se_`V'' if group=="`V'"
+	
 }
 
 gen groupnum = _n
@@ -153,11 +159,14 @@ replace groupname = "Presence of inversion" in 3
 
 labmask groupnum, values(groupname)
 
-tw  rspike upper lower groupnum, color("236 133 95") lwidth(thick) || sc beta groupnum, msymbol(O) mlcolor("236 133 95") mfcolor(white) msize(2.5) mlwidth(thick) /// 
+loc mycolor = "236 133 95"
+
+tw  rspike upper lower groupnum, color("`mycolor'%40") lwidth(thick) || ///
+	rspike ci90_hi ci90_lo groupnum, color("`mycolor'") lwidth(thick) || sc beta groupnum, msymbol(O) mlcolor("`mycolor'") mfcolor(white) msize(2.5) mlwidth(thick) ///
 	yline(0, lpattern(shortdash) lcolor(gs10)) ///
 	ylabel(0(.5)2.5, nogrid) xlabel(1(1)3, nogrid valuelabel) ///
 	ytitle("Effect of inversions on PM2.5") xtitle("Inversions variable") ///
-	legend(order(2 "point estimate" 1 "95% confidence interval"))
+	legend(order(3 "point estimate" 2 "90% confidence interval" 1 "95% confidence interval"))
 	
 	
 graph export "$resdir/figures/figure_2A.pdf", replace	

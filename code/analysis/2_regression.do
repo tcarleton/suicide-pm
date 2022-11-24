@@ -184,7 +184,10 @@ label var TIIndD1 "No. days with inversion"
 
 foreach V of varlist TINumD1 TIStrD1 TIIndD1 {
 
+loc outfilester "$resdir/ster/firststage_winsor_p`pp'_`V'.ster"
+
 reghdfe pm25 `V' $control2, absorb(dsp_code week) cluster(dsp_code week)
+estimates save "`outfilester'", replace
 outreg2 using "`outfile'", label tex(frag) ///
 append dec(3) nonotes keep(`V') nocons ///
 addtext(County FE, X, Week-of-sample FE, X)

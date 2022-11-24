@@ -124,8 +124,15 @@ bysort dsp_code: gen pm25_hat_fw= pm25_hat if week==firstweek
 bysort dsp_code: replace pm25_hat_fw=pm25_hat_fw[_n-1] if pm25_hat_fw[_n-1]!=. 
 
 gen yhat_actual = _b[pm25]*pm25
-gen yhat_counterfactual = _b[pm25]*pm25_detrended	
+gen yhat_acutal_ciLo = (_b[pm25]-1.96*_se[pm25])*pm25
+gen yhat_acutal_ciHi = (_b[pm25]+1.96*_se[pm25])*pm25
+gen yhat_counterfactual = _b[pm25]*pm25_detrended
+gen yhat_counterfactual_ciLo = (_b[pm25]-1.96*_se[pm25])*pm25_detrended
+gen yhat_counterfactual_ciHi = (_b[pm25]+1.96*_se[pm25])*pm25_detrended
 gen yhat_diff = _b[pm25] *(pm25_hat_fw - pm25_hat)
+gen yhat_diff_ciLo = (_b[pm25]-1.96*_se[pm25]) *(pm25_hat_fw - pm25_hat)
+gen yhat_diff_ciHi = (_b[pm25]+1.96*_se[pm25]) *(pm25_hat_fw - pm25_hat)
+
 
 * interpretation of yhat_diff: this is the change in the weekly suicide rate in each 
 * county-week that is *due* to declining overall pollution levels 
@@ -193,26 +200,34 @@ drop _merge
 
 * total lives in each week -- NOTE: regression is run in rates that are deaths per million people
 gen lives_saved = yhat_diff*(pop_tot/1000000) // this is: number of lives saved in each county in each week due to PM declines
+gen lives_saved_ciLo = yhat_diff_ciLo*(pop_tot/1000000)
+gen lives_saved_ciHi = yhat_diff_ciHi*(pop_tot/1000000)
 
 * total lives saved over the entire period, by county
-bysort dsp_code (lives_saved) : gen allmissing = mi(lives_saved[1])
-bysort dsp_code: egen lives_saved_tot = sum(lives_saved)
-replace lives_saved_tot = . if allmissing // missingness here from missing aqi data
+foreach V of varlist lives_saved lives_saved_ciLo lives_saved_ciHi {
+	capture drop allmissing
+	bysort dsp_code (`V') : gen allmissing = mi(`V'[1])
+	bysort dsp_code: egen `V'_tot = sum(`V')
+    replace `V'_tot = . if allmissing // missingness here from missing aqi data
+}
+
+
+//bysort dsp_code (lives_saved) : gen allmissing = mi(lives_saved[1])
+//bysort dsp_code: egen lives_saved_tot = sum(lives_saved)
+//replace lives_saved_tot = . if allmissing // missingness here from missing aqi data
 
 * save for plotting
 save "$datadir/lives_saved.dta", replace
 
 preserve
 * sum across the country
-collapse (sum) lives_saved, by(year)
+collapse (sum) lives_saved*, by(year)
 
 sort year
 di "Total lives saved in 2017 = " lives_saved[_N]
-*Total lives saved in 2017 = 14629.877
 
 collapse (sum) lives_saved
 di "Total lives saved over 2013-2017 period = " lives_saved[1]
-* Total lives saved over 2013-2017 period = 40430.009
 
 restore
 
@@ -232,7 +247,7 @@ destring city_id, replace
 
 sum lives_saved_tot	
 di "Number of counties included in calculation = " r(N)	
-*2721 counties	
+	
 
 ** find 10 most populous counties
 gen neg_poptot= - pop_tot

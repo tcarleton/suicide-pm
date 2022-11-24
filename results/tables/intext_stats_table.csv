@@ -19,6 +19,8 @@ statname,details,stat,stat_se,stat_pval
 "b_f65_85d24_rate","eff of 1 unit inc on sui rate",.0408104,.0150486,.007141
 "bSD_f65_85d24_rate","eff of 1SD inc on suirate",1.228326,.4529371,.007141
 "bSD_f65_85d24_rate_aspct","eff of 1SD inc on sui rate as pct avg",63.18226,,
+"b_TINumD1","eff of 1 TI on PM25",.5126554,.0792558,4.97e-10
+"b_d24_rate_OLS","eff of 1 unit inc on suirate in OLS",.0002468,.0001906,.1966061
 "totobs_WHO","total obs in WHO sample",3660,,
 "totCntrs_WHO","total countries in WHO sample",183,,
 "totCbtrs_WHO_OECD","total countries in WHO sample OECD",26,,
@@ -28,9 +30,20 @@ statname,details,stat,stat_se,stat_pval
 "totobs_sim","total obs in simulation",708050,,
 "totCnts_sim","total counties in simulation",2500,,
 "tot_lives_saved_CHN","total lives saved in CHN",45970.2,,
-"tot_lives_lost_CHN","total lives lost in CHN",-443.1939,,
+"tot_lives_saved_lost_CHN","total lives lost in CHN",-443.1939,,
+"tot_lives_saved_ciLo_CHN","total lives saved in CHN",13213.88,,
+"tot_lives_saved_ciLo_lost_CHN","total lives lost in CHN",-127.3937,,
+"tot_lives_saved_ciHi_CHN","total lives saved in CHN",78726.52,,
+"tot_lives_saved_ciHi_lost_CHN","total lives lost in CHN",-758.9941,,
 "tot_lives_saved_Binhai","total lives saved in Binhai",121.8272,,
+"tot_lives_saved_Binhai_lo","total lives saved in Binhai Lo",35.01856,,
+"tot_lives_saved_Binhai_hi","total lives saved in Binhai Hi",208.6358,,
 "tot_lives_saved_Wuhou","total lives saved in Wuhou",106.4694,,
+"tot_lives_saved_Wuhou_lo","total lives saved in Wuhou Lo",30.60405,,
+"tot_lives_saved_Wuhou_hi","total lives saved in Wuhou Hi",182.3348,,
+"tot_lives_saved_Pudong","total lives saved in Pudong",155.1726,,
+"tot_lives_saved_Pudong_lo","total lives saved in Pudong Lo",44.60351,,
+"tot_lives_saved_Pudong_hi","total lives saved in Pudong Hi",265.7417,,
 "no_cnties_lives_saved","no cnties saving lives",2374,,
 "pct_cnties_lives_saved","pct cnties saving lives",94.96,,
 "pct_decline_pm","pct CHN sui decline due to pm25",-10.27909,,

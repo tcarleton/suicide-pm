@@ -142,7 +142,6 @@ gen prd=(firstdigits==44)
 *  Jingjinji (note that it includes Beijing)
 gen jingjinji= (firstdigits==11 | firstdigits==12 | firstdigits==13) 
 
-**** TAMMA START EDITING HERE 
 
 * Compute total suicides by year by region over the 2013-2017 period
 gen insample_ma = (beijing==1 | yrd==1 | prd ==1 | jingjinji==1)
@@ -162,16 +161,20 @@ gen missing=(suicides==.)
 tab year if missing==1
 * missings only in 2015, 2016 and 2017
 
+* count total counties per region
+egen tag = tag(region dsp_code)
+egen ndistinct = total(tag), by(region)
+table region ndistinct
+drop tag ndistinct
+
 * so calculate the average population observed by county over 2013-2017
 bysort dsp_code: egen av_dsppop=mean(t_dsppop)
-
-* for suicides we could use the 2013 level because it's not affected by missings
 
 tempfile countypop
 save "`countypop'", replace
 
 * collapse to year-region
-collapse (sum) suicides av_dsppop, by(region year)
+collapse (sum) suicides av_dsppop (count) nobs = suicides, by(region year)
 
 tempfile sregions
 save "`sregions'", replace
@@ -180,7 +183,13 @@ save "`sregions'", replace
 ** Beijing
 use "`countypop'", clear
 
-collapse (sum) suicides av_dsppop, by(beijing year)
+* count total counties in beijing
+egen tag = tag(beijing dsp_code)
+egen ndistinct = total(tag), by(beijing)
+table beijing ndistinct
+drop tag ndistinct
+
+collapse (sum) suicides av_dsppop (count) suicides, by(beijing year)
 drop if beijing==0
 
 gen region=4

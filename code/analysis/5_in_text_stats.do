@@ -147,6 +147,18 @@ post stats ("bSD_f65_85d24_rate") ("eff of 1SD inc on suirate") (r(estimate)) (r
 loc aspct = (r(estimate)/`avg_f65_85d24_rate')*100
 post stats ("bSD_f65_85d24_rate_aspct") ("eff of 1SD inc on sui rate as pct avg") (`aspct') (.) (.)
 
+* reduced form 
+estimates use "$resdir/ster/firststage_winsor_p`pp'_TINumD1.ster"
+local t = _b[TINumD1]/_se[TINumD1]
+local p =2*ttail(e(df_r),abs(`t'))
+post stats ("b_TINumD1") ("eff of 1 TI on PM25") (_b[TINumD1]) (_se[TINumD1]) (`p')
+
+* OLS
+estimates use "$resdir/ster/winsor_p`pp'_d24_rate_OLS.ster"
+local t = _b[pm25]/_se[pm25]
+local p =2*ttail(e(df_r),abs(`t'))
+post stats ("b_d24_rate_OLS") ("eff of 1 unit inc on suirate in OLS") (_b[pm25]) (_se[pm25]) (`p')
+
 **********************************************************************************				                                                         *
 * WHO sample data descriptions
 **********************************************************************************
@@ -230,7 +242,19 @@ post stats ("totCnts_sim") ("total counties in simulation") (`r(N)') (.) (.)
 restore
 
 * overall, air quality improvements in China have avoided XX suicides and PM increases have caused YY suicides 
-preserve
+
+foreach V of varlist lives_saved lives_saved_ciLo lives_saved_ciHi {
+	preserve
+	egen CHN_tot`V' = sum(`V') if `V'>0
+	qui summ CHN_tot`V'
+	post stats ("tot_`V'_CHN") ("total lives saved in CHN") (r(mean)) (.) (.)
+	egen CHN_tot`V'_lost = sum(`V') if `V'<0
+	qui summ CHN_tot`V'_lost
+	post stats ("tot_`V'_lost_CHN") ("total lives lost in CHN") (r(mean)) (.) (.)
+	restore
+}
+
+/*
 egen CHN_totlives_saved = sum(lives_saved) if lives_saved>0
 qui summ CHN_totlives_saved
 post stats ("tot_lives_saved_CHN") ("total lives saved in CHN") (r(mean)) (.) (.)
@@ -238,15 +262,42 @@ egen CHN_totlives_lost = sum(lives_saved) if lives_saved<0
 qui summ CHN_totlives_lost
 post stats ("tot_lives_lost_CHN") ("total lives lost in CHN") (r(mean)) (.) (.)
 restore
+*/
 
 * Binhai and Wuhou avoided XX suicides
 preserve
 egen binhai_totlives = sum(lives_saved) if dsp_code==120116
+egen binhai_totlives_lo = sum(lives_saved_ciLo) if dsp_code==120116
+egen binhai_totlives_hi = sum(lives_saved_ciHi) if dsp_code==120116
 egen wuhou_totlives = sum(lives_saved) if dsp_code==510107
+egen wuhou_totlives_lo = sum(lives_saved_ciLo) if dsp_code==510107
+egen wuhou_totlives_hi = sum(lives_saved_ciHi) if dsp_code==510107
+egen pudong_totlives = sum(lives_saved) if dsp_code==310115
+egen pudong_totlives_lo = sum(lives_saved_ciLo) if dsp_code==310115
+egen pudong_totlives_hi = sum(lives_saved_ciHi) if dsp_code==310115
+
+
 summ binhai_totlives
 post stats ("tot_lives_saved_Binhai") ("total lives saved in Binhai") (r(mean)) (.) (.)
+summ binhai_totlives_lo
+post stats ("tot_lives_saved_Binhai_lo") ("total lives saved in Binhai Lo") (r(mean)) (.) (.)
+summ binhai_totlives_hi
+post stats ("tot_lives_saved_Binhai_hi") ("total lives saved in Binhai Hi") (r(mean)) (.) (.)
+
 summ wuhou_totlives
 post stats ("tot_lives_saved_Wuhou") ("total lives saved in Wuhou") (r(mean)) (.) (.)
+summ wuhou_totlives_lo
+post stats ("tot_lives_saved_Wuhou_lo") ("total lives saved in Wuhou Lo") (r(mean)) (.) (.)
+summ wuhou_totlives_hi
+post stats ("tot_lives_saved_Wuhou_hi") ("total lives saved in Wuhou Hi") (r(mean)) (.) (.)
+
+summ pudong_totlives
+post stats ("tot_lives_saved_Pudong") ("total lives saved in Pudong") (r(mean)) (.) (.)
+summ pudong_totlives_lo
+post stats ("tot_lives_saved_Pudong_lo") ("total lives saved in Pudong Lo") (r(mean)) (.) (.)
+summ pudong_totlives_hi
+post stats ("tot_lives_saved_Pudong_hi") ("total lives saved in Pudong Hi") (r(mean)) (.) (.)
+
 restore
 
 * XX counties experienced increased suicide deaths due to air quality declines. this is yy% of all counties in the data

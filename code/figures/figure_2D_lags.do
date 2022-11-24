@@ -44,6 +44,7 @@ gen lag = _n-1
 
 // main
 estimates use "$sterdir/winsor_`p'_`outcome'_lagRF8.ster"  
+di "estimating sample obs = " e(N)
 
 **********************************************************************************
 * Plot                                       
