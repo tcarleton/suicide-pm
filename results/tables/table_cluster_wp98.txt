@@ -9,5 +9,7 @@ R-squared		-0.0111	-0.0111	-0.0111	-0.0111
 County FE		X	X	X	X
 Week-of-sample FE		X	X	X	X
 Clustering		None	Week	County	County and week
-KP Test		961.7	57.88	125.7	41.84
+First stage F-stat		961.7	57.88	125.7	41.84
 p-value		0	0	0	1.61e-08
+AR Chi2 p-value		0.000577	0.000393	0.00283	0.00249
+SW S-stat		0.000577	0.000375	0.00291	0.00244

@@ -1,18 +1,20 @@
-\begin{tabular}{lccccc} \hline
- & (1) & (2) & (3) & (4) & (5) \\
-VARIABLES & d24\_rate & d24\_rate & d24\_rate & d24\_rate & d24\_rate \\ \hline
- &  &  &  &  &  \\
-PM2.5 & 0.0079*** & 0.0060** & 0.0079*** & 0.0077*** & 0.0070** \\
- & (0.0029) & (0.0025) & (0.0028) & (0.0028) & (0.0028) \\
- &  &  &  &  &  \\
-Observations & 139,196 & 139,110 & 139,196 & 139,196 & 139,196 \\
-R-squared & -0.0111 & -0.0058 & -0.0088 & -0.0086 & -0.0061 \\
-County FE & X & -- & -- & X & X \\
-County-year FE & -- & X & -- & -- & -- \\
-County-month FE & -- & -- & X & -- & -- \\
-Week-of-sample FE & X & X & X & X & X \\
-Prov. time trend & -- & -- & -- & X & -- \\
-County time trend & - & -- & -- & -- & X \\
-KP Test & 41.84 & 60.06 & 58.99 & 48.04 & 45.04 \\
- p-value & 1.61e-08 & 1.40e-10 & 9.06e-11 & 2.58e-09 & 6.21e-09 \\ \hline
+\begin{tabular}{lcccc} \hline
+ & (1) & (2) & (3) & (4) \\
+VARIABLES & d24\_rate & d24\_rate & d24\_rate & d24\_rate \\ \hline
+ &  &  &  &  \\
+PM2.5 & 0.0079*** & 0.0060** & 0.0079*** & 0.0018 \\
+ & (0.0029) & (0.0025) & (0.0028) & (0.0011) \\
+ &  &  &  &  \\
+Observations & 139,196 & 139,110 & 139,196 & 139,091 \\
+R-squared & -0.0111 & -0.0058 & -0.0088 & 0.0001 \\
+County FE & X & -- & -- & -- \\
+County-year FE & -- & X & -- & -- \\
+County-month FE & -- & -- & X & X \\
+Week-of-sample FE & X & X & X & X \\
+Prov. time trend & -- & -- & -- & -- \\
+County time trend & - & -- & -- & -- \\
+First stage F-stat & 41.84 & 60.06 & 58.99 & 82.46 \\
+p-value & 1.61e-08 & 1.40e-10 & 9.06e-11 & 0 \\
+AR Chi2 p-value & 0.00249 & 0.0102 & 0.00427 & 0.0878 \\
+ SW S-stat & 0.00244 & 0.00854 & 0.00429 & 0.0699 \\ \hline
 \end{tabular}

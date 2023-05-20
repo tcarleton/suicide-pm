@@ -1,15 +1,17 @@
-\begin{tabular}{lcccccc} \hline
- & (1) & (2) & (3) & (4) & (5) & (6) \\
-VARIABLES & d24\_rate & d24\_rate & d24\_rate & d24\_rate & d24\_rate & d24\_rate \\ \hline
- &  &  &  &  &  &  \\
-PM2.5 & 0.0079*** & 0.0084*** & 0.0087** & 0.0074** & 0.0095** & 0.0073* \\
- & (0.0029) & (0.0032) & (0.0036) & (0.0037) & (0.0045) & (0.0042) \\
- &  &  &  &  &  &  \\
-Observations & 139,196 & 139,196 & 139,196 & 139,196 & 139,196 & 139,196 \\
-R-squared & -0.0111 & -0.0125 & -0.0134 & -0.0095 & -0.0164 & -0.0093 \\
-IV & TINumD1 & TIStrD1 & TIIndD1 & TINumD2 & TIStrD2 & TIIndD2 \\
-County FE & X & X & X & X & X & X \\
-Week-of-sample FE & X & X & X & X & X & X \\
-KP Test & 41.84 & 30.27 & 33.57 & 19.57 & 13.34 & 17.47 \\
- p-value & 1.61e-08 & 9.75e-07 & 1.24e-07 & 3.63e-05 & 0.000559 & 6.67e-05 \\ \hline
+\begin{tabular}{lccc} \hline
+ & (1) & (2) & (3) \\
+VARIABLES & d24\_rate & d24\_rate & d24\_rate \\ \hline
+ &  &  &  \\
+PM2.5 & 0.0079*** & 0.0084*** & 0.0087** \\
+ & (0.0029) & (0.0032) & (0.0036) \\
+ &  &  &  \\
+Observations & 139,196 & 139,196 & 139,196 \\
+R-squared & -0.0111 & -0.0125 & -0.0134 \\
+IV & TINumD1 & TIStrD1 & TIIndD1 \\
+County FE & X & X & X \\
+Week-of-sample FE & X & X & X \\
+First stage F-stat & 41.84 & 30.27 & 33.57 \\
+p-value & 1.61e-08 & 9.75e-07 & 1.24e-07 \\
+AR Chi2 p-value & 0.00249 & 0.00224 & 0.00980 \\
+ SW S-stat & 0.00244 & 0.00252 & 0.00692 \\ \hline
 \end{tabular}
