@@ -493,12 +493,12 @@ foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_cMwFE.ster"
   qui ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code#year#quarter) cluster(dsp_code week) first
   estimates save "`outfilester'", replace
-  outreg2 using "`outfile'", label tex(frag) ///
+  /*outreg2 using "`outfile'", label tex(frag) ///
   append ctitle(`V') dec(4) ///
   keep(pm25) nocons nonotes ///
   addstat(First stage F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
   addtext(County FE, --, County-year FE, --, County-month FE, X, Week-of-sample FE, X, Prov. time trend, --, County time trend, --)
-  
+  */
 }
 *
 
@@ -513,13 +513,14 @@ forvalues i=1(1)31{
 *
 
 foreach V of varlist d24_rate {
+
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_provTFE.ster"
-  qui ivreghdfe `V' $control2 provt* (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) first
+   ivreghdfe `V' $control2 provt* (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) // note can't recover first stage w collinearity
   estimates save "`outfilester'", replace
   outreg2 using "`outfile'", label tex(frag) ///
   append ctitle(`V') dec(4) ///
   keep(pm25) nocons nonotes ///
-  addstat(First stage F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
+  addstat(First stage F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, 0, SW S-stat,0) ///
   addtext(County FE, X, County-year FE, --, County-month FE, --, Week-of-sample FE, X, Prov. time trend, X, County time trend, --)
   
 }
@@ -536,12 +537,12 @@ forvalues i=1(1)161{
 
 foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_counTFE.ster"
-  qui ivreghdfe `V' $control2 countyt* (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) first
+  qui ivreghdfe `V' $control2 countyt* (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) // note can't recover first stage w collinearity
   estimates save "`outfilester'", replace
   outreg2 using "`outfile'", label tex(frag) ///
   append ctitle(`V') dec(4) ///
   keep(pm25) nocons nonotes ///
-  addstat(First stage F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
+  addstat(First stage F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, 0, SW S-stat,0) ///
   addtext(County FE, X, County-year FE, --, County-month FE, --, Week-of-sample FE, X, Prov. time trend, --, County time trend, X)
  
 }
@@ -552,7 +553,7 @@ foreach V of varlist d24_rate  {
 *						                                                         *
 * Dynamics: lagged air pollution                                  *
 **********************************************************************************
-
+loc pp = 98
 use data_winsorize, clear
 tsset dsp_code week
 
@@ -755,7 +756,7 @@ foreach V of varlist d24_rate {
 *						                                                         *
 * Pollutants                        *
 **********************************************************************************
-
+loc pp = 98
 use data_winsorize, clear
 
 cap erase "$resdir/tables/table_pollutant_wp`pp'.tex"
