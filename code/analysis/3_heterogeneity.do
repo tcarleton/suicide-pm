@@ -158,6 +158,8 @@ replace `V'=. if `V'>`V'_phigh
 }
 *
 
+save data_winsorize_demographics, replace
+
 foreach V of varlist d24_rate fd24_rate md24_rate *0_15d24_rate *15_65d24_rate *65_85d24_rate {
 	
   loc outfilester "$resdir/ster/winsor_p`pp'_`V'_TINumD1.ster" 

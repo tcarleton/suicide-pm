@@ -51,7 +51,7 @@ save data_winsorize, replace
 
 * set up outfile -- stat, detail, estimate
 capture postutil clear
-postfile stats str30(statname) str50(details) stat stat_se stat_pval using "$resdir/tables/intext_stats_table.dta", replace
+postfile stats str50(statname) str50(details) stat stat_se stat_pval using "$resdir/tables/intext_stats_table.dta", replace
 
 **********************************************************************************				                                                         *
 * Descriptions of the data
@@ -98,7 +98,6 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
 	loc avg_`V' = `r(mean)'
 	post stats ("avg_`V'") ("avg over sample") (`r(mean)') (`r(sd)') (.)
 }
-
 
 **********************************************************************************				                                                         *
 * IV effect sizes
@@ -158,6 +157,23 @@ estimates use "$resdir/ster/winsor_p`pp'_d24_rate_OLS.ster"
 local t = _b[pm25]/_se[pm25]
 local p =2*ttail(e(df_r),abs(`t'))
 post stats ("b_d24_rate_OLS") ("eff of 1 unit inc on suirate in OLS") (_b[pm25]) (_se[pm25]) (`p')
+
+**********************************************************************************				                                                         *
+* Within panel unit variances by age and gender groups
+**********************************************************************************
+
+use data_winsorize_demographics, clear
+
+foreach V of varlist d24_rate fd24_rate md24_rate *0_15d24_rate *15_65d24_rate *65_85d24_rate {
+	* overall SD
+	qui summ `V', det
+	post stats ("SD_`V'") ("within county SD in sui rate") (`r(sd)') (.) (.)
+	
+	* within panel unit SD
+	qui loneway `V' dsp_code
+	loc SDw = `r(sd_w)'
+	post stats ("SDw_`V'") ("within county SD in sui rate") (`SDw') (.) (.)
+	}
 
 **********************************************************************************				                                                         *
 * WHO sample data descriptions
@@ -414,3 +430,4 @@ postclose stats
 * save csv
 use "$resdir/tables/intext_stats_table.dta", clear
 outsheet using "$resdir/tables/intext_stats_table.csv", comma replace
+

@@ -5,7 +5,6 @@ pm25	PM2.5	0.0079***	0.0079***	0.0079***	0.0079***
 		(0.0023)	(0.0024)	(0.0028)	(0.0029)
 					
 Observations		139,196	139,196	139,196	139,196
-R-squared		-0.0111	-0.0111	-0.0111	-0.0111
 County FE		X	X	X	X
 Week-of-sample FE		X	X	X	X
 Clustering		None	Week	County	County and week
