@@ -8,7 +8,7 @@ Observations		139,196	139,196	139,196
 IV		TINumD1	TIStrD1	TIIndD1
 County FE		X	X	X
 Week-of-sample FE		X	X	X
-First stage F-stat		41.84	30.27	33.57
+KP F-stat		41.84	30.27	33.57
 p-value		1.61e-08	9.75e-07	1.24e-07
 AR Chi2 p-value		0.00249	0.00224	0.00980
 SW S-stat		0.00244	0.00252	0.00692
