@@ -1,8 +1,8 @@
 
 rm(list=ls())
-setwd("~/Dropbox/Works_in_progress/git_repos/suicide-pm") # this is the location of the cloned repository 
-datadir = "~/Dropbox/suicide/main_2017/" # this is the location of the data released for replication of the paper 
-shpdir = "~/Dropbox/suicide/raw_data" # this is the location of the shapefiles for Chinese counties
+setwd("C:/Users/Tyler/Documents/GitHub/suicide-pm") # this is the location of the cloned repository 
+datadir = "C:/Users/Tyler/Documents/GitHub/suicide-pm-data/data" # this is the location of the data released for replication of the paper 
+shpdir = "C:/Users/Tyler/Documents/GitHub/suicide-pm-data/shapefiles" # this is the location of the shapefiles for Chinese counties
 
 ### Packages
 list.of.packages <- c("tidyverse", "haven", "sf", "sp", "rgdal", "lubridate", "dplyr","raster", 
@@ -16,58 +16,58 @@ invisible(lapply(list.of.packages, library, character.only = TRUE))
 
 pollution <- read_dta(file.path(datadir,"pollution_county_daily_2013_2018.dta"))
 
-# SECTION I: COUNTY TREND COEFFICIENTS --------------------------------------------------------
-  
-# remove 2018 as it is not used in our estimation sample in estimating the suicide-PM relationship
-pollution <- pollution %>% filter(year<2018)
-
- # day of sample 
-pollution <- pollution %>% 
-  mutate(datevar = paste0(year,"-", month, "-",day)) %>%
-  mutate(datevar = as.Date(datevar)) 
-
-china_pollution <- data.frame(matrix(nrow = 0, ncol = 0))
-
-for (i in seq_along(unique(pollution$county_id))){
-  tryCatch({
-  
-  pollution_county <- pollution %>% filter(county_id == unique(pollution$county_id)[i])
-  #pm25 average
-  mean_pm25 <- pollution_county %>% pull(pm25) %>% mean(na.rm = TRUE)
-  #pm25 coeff, se, pvalue
-  coeff_pm25 <- lm(pm25~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,1]}
-  se_pm25 <- lm(pm25~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,2]}
-  pvalue_pm25 <- lm(pm25~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,4]}
-  
-  #pm10 average
-  mean_pm10 <- pollution_county %>% pull(pm10) %>% mean(na.rm = TRUE)
-  #pm10 coeff, se, pvalue
-  coeff_pm10 <- lm(pm10~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,1]}
-  se_pm10 <- lm(pm10~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,2]}
-  pvalue_pm10 <- lm(pm10~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,4]}
-  
-  
-  #aqi average
-  mean_aqi <- pollution_county %>% pull(aqi) %>% mean(na.rm = TRUE)
-  #aqi coeff, se, pvalue
-  coeff_aqi <- lm(aqi~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,1]}
-  se_aqi <- lm(aqi~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,2]}
-  pvalue_aqi <- lm(aqi~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,4]}
-  
-  county_id <- unique(pollution$county_id)[i]
-  results_county <- data.frame(county_id, 
-                               mean_pm25, coeff_pm25, se_pm25, pvalue_pm25,
-                               mean_pm10, coeff_pm10, se_pm10, pvalue_pm10,
-                               mean_aqi, coeff_aqi, se_aqi, pvalue_aqi)
-  
-  china_pollution <- bind_rows(china_pollution, results_county)
-  
-  print(paste0("-------- Done with county ",unique(pollution$county_id)[i], " in ", i, " of ", length(unique(pollution$county_id))))
-  }, error = function(e){cat("Error:", conditionMessage(e), '\n')})
-}
-
-
-write.csv(china_pollution, file.path(datadir,"chn_pollution.csv"), row.names = FALSE)
+# # SECTION I: COUNTY TREND COEFFICIENTS --------------------------------------------------------
+#   
+# # remove 2018 as it is not used in our estimation sample in estimating the suicide-PM relationship
+# pollution <- pollution %>% filter(year<2018)
+# 
+#  # day of sample 
+# pollution <- pollution %>% 
+#   mutate(datevar = paste0(year,"-", month, "-",day)) %>%
+#   mutate(datevar = as.Date(datevar)) 
+# 
+# china_pollution <- data.frame(matrix(nrow = 0, ncol = 0))
+# 
+# for (i in seq_along(unique(pollution$county_id))){
+#   tryCatch({
+#   
+#   pollution_county <- pollution %>% filter(county_id == unique(pollution$county_id)[i])
+#   #pm25 average
+#   mean_pm25 <- pollution_county %>% pull(pm25) %>% mean(na.rm = TRUE)
+#   #pm25 coeff, se, pvalue
+#   coeff_pm25 <- lm(pm25~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,1]}
+#   se_pm25 <- lm(pm25~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,2]}
+#   pvalue_pm25 <- lm(pm25~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,4]}
+#   
+#   #pm10 average
+#   mean_pm10 <- pollution_county %>% pull(pm10) %>% mean(na.rm = TRUE)
+#   #pm10 coeff, se, pvalue
+#   coeff_pm10 <- lm(pm10~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,1]}
+#   se_pm10 <- lm(pm10~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,2]}
+#   pvalue_pm10 <- lm(pm10~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,4]}
+#   
+#   
+#   #aqi average
+#   mean_aqi <- pollution_county %>% pull(aqi) %>% mean(na.rm = TRUE)
+#   #aqi coeff, se, pvalue
+#   coeff_aqi <- lm(aqi~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,1]}
+#   se_aqi <- lm(aqi~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,2]}
+#   pvalue_aqi <- lm(aqi~datevar, pollution_county) %>% summary() %>% {.$coefficients} %>% {.[2,4]}
+#   
+#   county_id <- unique(pollution$county_id)[i]
+#   results_county <- data.frame(county_id, 
+#                                mean_pm25, coeff_pm25, se_pm25, pvalue_pm25,
+#                                mean_pm10, coeff_pm10, se_pm10, pvalue_pm10,
+#                                mean_aqi, coeff_aqi, se_aqi, pvalue_aqi)
+#   
+#   china_pollution <- bind_rows(china_pollution, results_county)
+#   
+#   print(paste0("-------- Done with county ",unique(pollution$county_id)[i], " in ", i, " of ", length(unique(pollution$county_id))))
+#   }, error = function(e){cat("Error:", conditionMessage(e), '\n')})
+# }
+# 
+# 
+# write.csv(china_pollution, file.path(datadir,"chn_pollution.csv"), row.names = FALSE)
 
 
 # SECTION II: POLLUTION AVERAGE MAP --------------------------------------------------------
@@ -82,92 +82,92 @@ china_shp_plot <- china_shp %>%
   left_join(china_pollution, by = c("ADMINCODE" = "county_id")) 
 
 
-  # COUNTY AVERAGE PM 2.5 ================================================================
-
-  # continues scale
-ggplot() +
-  geom_sf(data = china_shp_plot, aes(fill = mean_pm25), color = NA) +
-  geom_sf(data = china_pro, fill = NA, color = "white", size = 0.3) +
-  geom_sf(data = china_city, fill = NA, color = alpha("white", 1 / 2), size = 0.1) +
-  
-
-  scale_fill_viridis(option = "magma", direction = -1, na.value="grey70", 
-                     guide = guide_colorbar(
-                       direction = "horizontal",
-                       barheight = unit(2, units = "mm"),
-                       barwidth = unit(50, units = "mm"),
-                       draw.ulim = F,
-                       title.position = 'top',
-                       # some shifting around
-                       title.hjust = 0.5,
-                       label.hjust = 0.5
-                     )) +  
-  scale_color_viridis(option = "magma", direction = -1, guide = "none", na.value="grey70") +  
-
-  scale_y_continuous(limits = c(20,55)) +
-  
-  labs(fill = "Average PM 2.5",
-       title = "China's regional demographics",
-       subtitle = "County Average PM 2.5, 2013 ~ 2017") +
-  
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank(),
-        plot.title = element_text(size = 20),
-        plot.subtitle = element_text(size = 15),
-        axis.ticks = element_blank(),
-        axis.text = element_blank(),
-        legend.position = "bottom"); ggsave(file.path("results", "figures", "appendix", "average_pm25.pdf"), width = 20, height = 20, units = "cm")
-
-
-  # COUNTY AVERAGE  AQI AND PM 10 ========================================================
-  
-  # NOTE: the following code will produce an AQI map
-  #       if you want to create the the pm10 map, change the plot title and fill = mean_aqi to mean_pm10
-
-ggplot() +
-  geom_sf(data = china_shp_plot, aes(fill = mean_aqi), color = NA) +
-  geom_sf(data = china_pro, fill = NA, color = "white", size = 0.3) +
-  geom_sf(data = china_city, fill = NA, color = alpha("white", 1 / 2), size = 0.1) +
-  
-  
-  scale_fill_viridis(option = "magma", direction = -1, na.value="grey70",  
-                     guide = guide_colorbar(
-                       direction = "horizontal",
-                       barheight = unit(2, units = "mm"),
-                       barwidth = unit(50, units = "mm"),
-                       draw.ulim = F,
-                       title.position = 'top',
-                       # some shifting around
-                       title.hjust = 0.5,
-                       label.hjust = 0.5
-                     )) +  
-  scale_color_viridis(option = "magma", direction = -1, guide = "none", na.value="grey70") +  
-  
-  scale_y_continuous(limits = c(20,55)) +
-  
-  labs(fill = "Average Air Quality Index",
-       title = "China's regional demographics",
-       subtitle = "County Average Air Quality Index, 2013 ~ 2017") +
-  
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank(),
-        plot.title = element_text(size = 20),
-        plot.subtitle = element_text(size = 15),
-        axis.ticks = element_blank(),
-        axis.text = element_blank(),
-        legend.position = "bottom"); ggsave(file.path("results", "figures", "appendix","average_aqi.pdf"), width = 20, height = 20, units = "cm")
-
+#   # COUNTY AVERAGE PM 2.5 ================================================================
+# 
+#   # continues scale
+# ggplot() +
+#   geom_sf(data = china_shp_plot, aes(fill = mean_pm25), color = NA) +
+#   geom_sf(data = china_pro, fill = NA, color = "white", size = 0.3) +
+#   geom_sf(data = china_city, fill = NA, color = alpha("white", 1 / 2), size = 0.1) +
+#   
+# 
+#   scale_fill_viridis(option = "magma", direction = -1, na.value="grey70", 
+#                      guide = guide_colorbar(
+#                        direction = "horizontal",
+#                        barheight = unit(2, units = "mm"),
+#                        barwidth = unit(50, units = "mm"),
+#                        draw.ulim = F,
+#                        title.position = 'top',
+#                        # some shifting around
+#                        title.hjust = 0.5,
+#                        label.hjust = 0.5
+#                      )) +  
+#   scale_color_viridis(option = "magma", direction = -1, guide = "none", na.value="grey70") +  
+# 
+#   scale_y_continuous(limits = c(20,55)) +
+#   
+#   labs(fill = "Average PM 2.5",
+#        title = "China's regional demographics",
+#        subtitle = "County Average PM 2.5, 2013 ~ 2017") +
+#   
+#   theme(panel.grid.major = element_blank(), 
+#         panel.grid.minor = element_blank(),
+#         panel.background = element_blank(),
+#         plot.title = element_text(size = 20),
+#         plot.subtitle = element_text(size = 15),
+#         axis.ticks = element_blank(),
+#         axis.text = element_blank(),
+#         legend.position = "bottom"); ggsave(file.path("results", "figures", "appendix", "average_pm25.pdf"), width = 20, height = 20, units = "cm")
+# 
+# 
+#   # COUNTY AVERAGE  AQI AND PM 10 ========================================================
+#   
+#   # NOTE: the following code will produce an AQI map
+#   #       if you want to create the the pm10 map, change the plot title and fill = mean_aqi to mean_pm10
+# 
+# ggplot() +
+#   geom_sf(data = china_shp_plot, aes(fill = mean_aqi), color = NA) +
+#   geom_sf(data = china_pro, fill = NA, color = "white", size = 0.3) +
+#   geom_sf(data = china_city, fill = NA, color = alpha("white", 1 / 2), size = 0.1) +
+#   
+#   
+#   scale_fill_viridis(option = "magma", direction = -1, na.value="grey70",  
+#                      guide = guide_colorbar(
+#                        direction = "horizontal",
+#                        barheight = unit(2, units = "mm"),
+#                        barwidth = unit(50, units = "mm"),
+#                        draw.ulim = F,
+#                        title.position = 'top',
+#                        # some shifting around
+#                        title.hjust = 0.5,
+#                        label.hjust = 0.5
+#                      )) +  
+#   scale_color_viridis(option = "magma", direction = -1, guide = "none", na.value="grey70") +  
+#   
+#   scale_y_continuous(limits = c(20,55)) +
+#   
+#   labs(fill = "Average Air Quality Index",
+#        title = "China's regional demographics",
+#        subtitle = "County Average Air Quality Index, 2013 ~ 2017") +
+#   
+#   theme(panel.grid.major = element_blank(), 
+#         panel.grid.minor = element_blank(),
+#         panel.background = element_blank(),
+#         plot.title = element_text(size = 20),
+#         plot.subtitle = element_text(size = 15),
+#         axis.ticks = element_blank(),
+#         axis.text = element_blank(),
+#         legend.position = "bottom"); ggsave(file.path("results", "figures", "appendix","average_aqi.pdf"), width = 20, height = 20, units = "cm")
+# 
 
 # SECTION III: POLLUTION COUNTY TREND MAP --------------------------------------------------------
 
 china_shp_plot <- china_shp %>%
   mutate(ADMINCODE = as.numeric(ADMINCODE)) %>%
   left_join(china_pollution, by = c("ADMINCODE" = "county_id"))  %>% 
-  dplyr::select(ADMINCODE, coeff_pm10, coeff_pm25, coeff_aqi) %>%
-  gather(key = "indicator", value = "coef", -c(ADMINCODE, geometry)) %>%
-  mutate(indicator = sub("coeff_", "", indicator))
+  dplyr::select(ADMINCODE, coeff_pm25, pvalue_pm25) #%>%
+  #gather(key = "indicator", value = "coef", -c(ADMINCODE, geometry)) %>%
+  #mutate(indicator = sub("coeff_", "", indicator))
 
   # NOTE: the following code creates a dummy variable for significance level threshold 0.05
   #       skip if you do not want outline counties by coefficient significance level 
@@ -184,19 +184,34 @@ china_shp_plot <- china_shp %>%
 # pm_25sig_pro_st <- pm_25sig_pro_agg %>% st_as_sf()
 
 # only want coefficient on pm25
-china_shp_plot = china_shp_plot %>% filter(indicator=="pm25")
+#china_shp_plot = china_shp_plot %>% filter(indicator %in% c("pm25", "pvalue_pm25"))
 
-# convert trends to per year (from per day)
-china_shp_plot$coef = china_shp_plot$coef*365
+# convert trends to per year (from per day) 
+china_shp_plot <- china_shp_plot %>% 
+  mutate(coeff_pm25 = coeff_pm25 * 365) %>% 
+  mutate(is_sig = ifelse(pvalue_pm25 >= .05, 0, 1))
+
+# create new df to house only statistically insignificant regions
+china_shp_insig <- china_shp_plot %>% 
+  filter(pvalue_pm25 >= .05)
+
+# Report percent of obs that are significant - 94.64799%
+100*mean(china_shp_plot$is_sig, na.rm = TRUE)
 
 # simplify geometries  
 simplepolys <- rmapshaper::ms_simplify(input = as(china_shp_plot, 'Spatial')) %>%
   st_as_sf()
 
+simple_insig <- rmapshaper::ms_simplify(input = as(china_shp_insig, 'Spatial')) %>%
+  st_as_sf()
+
 ggplot() +
-  geom_sf(data = simplepolys, aes(fill = coef), color = NA) +
+  geom_sf(data = simplepolys, aes(fill = coeff_pm25, color = significant), color = NA) +
   geom_sf(data = china_pro, fill = NA, color = "gray40", size = 0.3) +
   geom_sf(data = china_city, fill = NA, color = alpha("gray40", 1 / 2), size = 0.1) +
+  geom_sf(data = simple_insig, color = "red", fill = NA) +
+
+  
   
   # NOTE: comment the following if you want to outline counties by coefficient significance level 
   #geom_sf(data = pm_25sig_pro_st, fill = NA,color = alpha("gold4", 0.5), size = 0.5) +
@@ -213,6 +228,7 @@ ggplot() +
                          title.hjust = 0.5,
                          label.hjust = 0.5
                        )) +  
+
   
   #scale_y_continuous(limits = c(20,55)) +
   
@@ -229,4 +245,4 @@ ggplot() +
         axis.text = element_blank(),
         legend.position = "bottom",
         strip.background = element_rect(fill="white", size=1.5),
-        strip.text.x = element_text(size = 10)); ggsave(file.path("results","figures","Figure_1B_PMmap.png"), width = 20, height = 20, units = "cm")
+        strip.text.x = element_text(size = 10))#; ggsave(file.path("results","figures","Figure_1B_PMmap.png"), width = 20, height = 20, units = "cm")
