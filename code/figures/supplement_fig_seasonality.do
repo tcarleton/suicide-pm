@@ -94,10 +94,10 @@ foreach var in "d24_rate" "TINumD1" {
 sort dsp_code weekdate	
 
 loc width = "medthick"
-loc id1 = 320382 
-loc reg1 = "NAME1" 
-loc id2 = 430922
-loc reg2 = "NAME2" 
+loc id2 = 320382 
+loc reg2 = "Pizhou" 
+loc id1 = 430922
+loc reg1 = "Taojiang" 
 
 keep if dsp_code==`id1' | dsp_code==`id2'
 gen dspname_Eng = "`reg1'" if dsp_code==`id1'
@@ -105,13 +105,6 @@ replace dspname_Eng = "`reg2'" if dsp_code==`id2'
 
 keep *_resid* d24_rate weekdate dspname_Eng  TINumD1  
 reshape wide *_resid* d24_rate   TINumD1 , i(weekdate) j(dspname_Eng) string
-
-* for testing only
-loc width = "medthick"
-loc id2 = 320382 
-loc reg2 = "NAME1" 
-loc id1 = 430922
-loc reg1 = "NAME2" 
 
 foreach var in "d24_rate" "TINumD1"  {
 	if "`var'" == "d24_rate" {
