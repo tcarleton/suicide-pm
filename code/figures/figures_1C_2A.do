@@ -47,7 +47,7 @@ preserve
 loc smooth = "weekdate" // "modate"
 
 // collapse across different groups
-collapse (mean) d24_rate pm25 [aw=t_dsppop], by(`smooth')
+collapse (mean) d24_rate pm25 year [aw=t_dsppop], by(`smooth')
 tempfile totrate
 save "`totrate'", replace
 
@@ -96,7 +96,7 @@ tw  line md24_rate `smooth', lcolor("167 203 226") lpattern(solid) yaxis(1) || /
 	ytitle("Suicide rate (per 10,000)", axis(1)) ///
 	ytitle("PM2.5 (ug/m3)", axis(2)) xtitle("Date")
 */
-
+	
 // double y-axes: show suicide and pm25	
 tw  line d24_rate `smooth', lcolor(black%80) lpattern(solid) lwidth(medthick) yaxis(1) || ///
 	line pm25 `smooth', lcolor(eltblue%80) lpattern(solid) lwidth(medthick) yaxis(2) lwidth(medthick)  || ///

@@ -252,7 +252,7 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
 
   qui ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) first
   outreg2 using "`outfile'", label tex(frag) nor2 ///
-  append ctitle(`V': IV) dec(4) ///
+  append ctitle(`V': 2SLS) dec(4) ///
   keep(pm25) nocons nonotes ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
   addtext(County FE, X, Week-of-sample FE, X)
@@ -264,7 +264,7 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
   estimates save "`outfilester'", replace
   
   outreg2 using "`outfile'", label tex(frag) nor2 ///
-  append ctitle(`V': OLS) dec(4) ///
+  append ctitle(`V': TWFE) dec(4) ///
   keep(pm25) nocons nonotes ///
   addtext (County FE, X, Week-of-sample FE, X)
 }

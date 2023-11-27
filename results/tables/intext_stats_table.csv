@@ -11,16 +11,16 @@ statname,details,stat,stat_se,stat_pval
 "b_md24_rate","eff of 1 unit inc on sui rate",.0048231,.0032915,.1440607
 "SD_PM25","within county SD in PM25",30.09833,,
 "bSD_d24_rate","eff of 1SD inc on suirate",.2389819,.0868816,.0063703
-"bSD_d24_rate_aspct","eff of 1SD inc on sui rate as pct avg",24.93484,,
+"bSD_d24_rate_aspct","eff of 1SD inc on sui rate as pct avg",24.93484,9.065027,
 "bSD_fd24_rate","eff of 1SD inc on suirate",.1937252,.0893711,.0311037
-"bSD_fd24_rate_aspct","eff of 1SD inc on sui rate as pct avg",27.6933,,
+"bSD_fd24_rate_aspct","eff of 1SD inc on sui rate as pct avg",27.6933,12.77573,
 "bSD_md24_rate","eff of 1SD inc on suirate",.1451676,.09907,.1440607
-"bSD_md24_rate_aspct","eff of 1SD inc on sui rate as pct avg",14.00296,,
+"bSD_md24_rate_aspct","eff of 1SD inc on sui rate as pct avg",14.00296,9.556358,
 "b_f65_85d24_rate","eff of 1 unit inc on sui rate",.0408104,.0150486,.007141
 "bSD_f65_85d24_rate","eff of 1SD inc on suirate",1.228326,.4529371,.007141
 "bSD_f65_85d24_rate_aspct","eff of 1SD inc on sui rate as pct avg",63.18226,,
 "b_TINumD1","eff of 1 TI on PM25",.5126554,.0792558,4.97e-10
-"b_d24_rate_OLS","eff of 1 unit inc on suirate in OLS",.0002468,.0001906,.1966061
+"b_d24_rate_OLS","eff of 1 unit inc on suirate in OLS",.0001422,.0001937,.4635215
 "SD_d24_rate","within county SD in sui rate",1.592258,,
 "SDw_d24_rate","within county SD in sui rate",1.442655,,
 "SD_fd24_rate","within county SD in sui rate",1.711012,,

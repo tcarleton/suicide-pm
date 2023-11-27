@@ -59,14 +59,14 @@ foreach V of varlist d_rate_ad {
 
   ivreghdfe `V' $control2 (pm25=TINumD1), first absorb(i.dsp_code i.week) cluster(dsp_code week)
   outreg2 using "table_main_wp_d1920.xls", ///
-  append ctitle(`V': IV) dec(4) ///
+  append ctitle(`V': 2SLS) dec(4) ///
   keep(pm25) ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
   addtext(County FE, Yes, Week FE, Yes, Clustering: County and week, Yes)
  
   reghdfe `V' $control2 pm25, absorb(i.dsp_code i.week) cluster(dsp_code week)
   outreg2 using "table_main_wp_d1920.xls", ///
-  append ctitle(`V': FE) dec(4) ///
+  append ctitle(`V': TWFE) dec(4) ///
   keep(pm25) ///
   addtext (County FE, Yes, Week FE, Yes, Clustering: County and week, Yes)
 }

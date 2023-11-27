@@ -122,10 +122,12 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
 	qui ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) 
 	lincom _b[pm25]*`within_sd'
 	post stats ("bSD_`V'") ("eff of 1SD inc on suirate") (r(estimate)) (r(se)) (r(p))
+	loc myse = r(se)
 	
 	* pct above average rate
 	loc aspct = (r(estimate)/`avg_`V'')*100
-	post stats ("bSD_`V'_aspct") ("eff of 1SD inc on sui rate as pct avg") (`aspct') (.) (.)
+	loc aspct_se = (`myse'/`avg_`V'')*100
+	post stats ("bSD_`V'_aspct") ("eff of 1SD inc on sui rate as pct avg") (`aspct') (`aspct_se') (.)
 }
 
 ****** repeat for women aged 65-85, as they are shown to be the most sensitive 
