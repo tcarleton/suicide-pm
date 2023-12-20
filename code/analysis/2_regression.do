@@ -188,11 +188,13 @@ loc outfilester "$resdir/ster/firststage_winsor_p`pp'_`V'.ster"
 
 reghdfe pm25 `V' $control2, absorb(dsp_code week) cluster(dsp_code week)
 estimates save "`outfilester'", replace
-outreg2 using "`outfile'", label tex(frag) ///
+outreg2 using "`outfile'", label tex(frag) stats(coef se pval) ///
 append dec(3) nonotes keep(`V') nocons ///
 addtext(County FE, X, Week-of-sample FE, X)
 }
 *
+
+
 
 
 **********************************************************************************
@@ -226,7 +228,7 @@ foreach A of varlist TINumD1 TIStrD1 TIIndD1  { // can add other thermal layers:
 	estimates save "`outfilester'", replace
   
 
-	  outreg2 using "`outfile'", label tex(frag) nor2 ///
+	  outreg2 using "`outfile'", label tex(frag) nor2 stats(coef se pval) ///
 	  append dec(4) ///
 	  keep(pm25) nocons nonotes ///
 	  addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
@@ -251,7 +253,7 @@ label var pm25 "PM2.5"
 foreach V of varlist d24_rate fd24_rate md24_rate {
 
   qui ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) first
-  outreg2 using "`outfile'", label tex(frag) nor2 ///
+  outreg2 using "`outfile'", label tex(frag) nor2 stats(coef se pval) ///
   append ctitle(`V': 2SLS) dec(4) ///
   keep(pm25) nocons nonotes ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
@@ -263,7 +265,7 @@ foreach V of varlist d24_rate fd24_rate md24_rate {
   * save estimates for use in figures
   estimates save "`outfilester'", replace
   
-  outreg2 using "`outfile'", label tex(frag) nor2 ///
+  outreg2 using "`outfile'", label tex(frag) nor2 stats(coef se pval) ///
   append ctitle(`V': TWFE) dec(4) ///
   keep(pm25) nocons nonotes ///
   addtext (County FE, X, Week-of-sample FE, X)
@@ -291,7 +293,7 @@ foreach V of varlist d24_rate  {
   
   qui ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) first
   estimates save "`outfilester'", replace
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep(pm25) nocons nonotes ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
@@ -306,7 +308,7 @@ foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_clWeek.ster"
   qui ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(week) first
   estimates save "`outfilester'", replace
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep(pm25) nocons nonotes ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
@@ -321,7 +323,7 @@ foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_clCounty.ster"
   qui ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code) first
   estimates save "`outfilester'", replace
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep(pm25) nocons nonotes ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
@@ -334,7 +336,7 @@ foreach V of varlist d24_rate  {
 
 foreach V of varlist d24_rate {
   qui ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) first
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep(pm25) nocons nonotes ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
@@ -371,7 +373,7 @@ foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_noWeather.ster"
   qui ivreghdfe `V' (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) first
   estimates save "`outfilester'", replace
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep(pm25) nocons nonotes ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
@@ -386,7 +388,7 @@ foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_linWeather.ster"
   qui ivreghdfe `V' $control (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) first
   estimates save "`outfilester'", replace
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep(pm25) nocons nonotes ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
@@ -399,7 +401,7 @@ foreach V of varlist d24_rate  {
 
 foreach V of varlist d24_rate  {
   qui ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) first
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep(pm25) nocons nonotes ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
@@ -414,7 +416,7 @@ foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_binWeather.ster"
   qui ivreghdfe `V' $control_bins (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) first partial($control_bins)
   estimates save "`outfilester'", replace
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep(pm25) nocons nonotes ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat, e(sstatp)) ///
@@ -441,7 +443,7 @@ cap erase "$resdir/tables/table_fe_wp`pp'.txt"
 foreach V of varlist d24_rate  {
 
   qui ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) first
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep(pm25) nocons nonotes ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
@@ -456,7 +458,7 @@ foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_cYwFE.ster"
   qui ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code#year week) cluster(dsp_code week) first
   estimates save "`outfilester'", replace
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep(pm25) nocons nonotes ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
@@ -471,7 +473,7 @@ foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_cMwFE.ster"
   qui ivreghdfe `V' $control2 (pm25=TINumD1), absorb(dsp_code#month week) cluster(dsp_code week) first
   estimates save "`outfilester'", replace
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep(pm25) nocons nonotes ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
@@ -495,7 +497,7 @@ foreach V of varlist d24_rate {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_provTFE.ster"
    qui ivreghdfe `V' $control2 provt* (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) partial(provt*) first // 
   estimates save "`outfilester'", replace
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep(pm25) nocons nonotes ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
@@ -517,7 +519,7 @@ foreach V of varlist d24_rate  {
 	loc outfilester "$resdir/ster/winsor_p`pp'_`V'_counTFE.ster"
   qui ivreghdfe `V' $control2 countyt* (pm25=TINumD1), absorb(dsp_code week) cluster(dsp_code week) partial(countyt*) first // note can't recover first stage w collinearity
   estimates save "`outfilester'", replace
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep(pm25) nocons nonotes ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
@@ -569,7 +571,7 @@ foreach i of numlist 1/10 {
   tem_ave*_ave`i' pre*_ave`i' ssd*_ave`i' win*_ave`i' rhu*_ave`i' prs*_ave`i' /// 
   (pm25_ave`i'=TINumD1_ave`i'), absorb(dsp_code week) cluster(dsp_code week) first
   estimates save "`outfilester'", replace
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep(pm25_ave`i') nocons nonotes ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///   
@@ -616,7 +618,7 @@ foreach V of varlist d24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep (TINumD1*) nocons nonotes ///
   addtext (Cum. effect, `b', Cum. effect SE, `se', Cum. effect t-stat, `t')
@@ -631,7 +633,7 @@ foreach V of varlist d24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep (TINumD1*) nocons nonotes ///
   addtext (Cum. effect, `b', Cum. effect SE, `se', Cum. effect t-stat, `t')
@@ -661,7 +663,7 @@ foreach V of varlist d24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
-  outreg2 using "`outfile'", label tex(frag) nor2 ///
+  outreg2 using "`outfile'", label tex(frag) nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep (TINumD1*) nocons nonotes ///
   addtext (Cum. effect, `b', Cum. effect SE, `se', Cum. effect t-stat, `t')
@@ -676,7 +678,7 @@ foreach V of varlist d24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep (TINumD1*) nocons nonotes ///
   addtext (Cum. effect, `b', Cum. effect SE, `se', Cum. effect t-stat, `t')
@@ -691,7 +693,7 @@ foreach V of varlist d24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
-  outreg2 using "`outfile'", label tex(frag)  nor2 ///
+  outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep (TINumD1*) nocons nonotes ///
   addtext (Cum. effect, `b', Cum. effect SE, `se', Cum. effect t-stat, `t')
@@ -706,7 +708,7 @@ foreach V of varlist d24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
-  outreg2 using "`outfile'", label tex(frag) nor2 ///
+  outreg2 using "`outfile'", label tex(frag) nor2 stats(coef se pval) ///
   append ctitle(`V') dec(4) ///
   keep (TINumD1*) nocons nonotes ///
   addtext (Cum. effect, `b', Cum. effect SE, `se', Cum. effect t-stat, `t')
@@ -722,7 +724,7 @@ foreach V of varlist d24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
-  outreg2 using "`outfile'", label tex(frag) nor2   ///
+  outreg2 using "`outfile'", label tex(frag) nor2 stats(coef se pval)  ///
   append ctitle(`V') dec(4) ///
   keep (TINumD1*) nocons nonotes ///
   addtext (Cum. effect, `b', Cum. effect SE, `se', Cum. effect t-stat, `t')
@@ -746,7 +748,7 @@ loc outfile = "$resdir/tables/table_pollutant_wp`pp'.tex"
 foreach A of varlist aqi-co {
 foreach V of varlist d24_rate {
 qui ivreghdfe `V' $control2 (`A'=TINumD1), absorb(dsp_code week) cluster(dsp_code week) first
-outreg2 using "`outfile'",  nor2 ///
+outreg2 using "`outfile'",  nor2 stats(coef se pval) ///
 append ctitle(`V') dec(4) ///
 keep(`A') ///
 addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///

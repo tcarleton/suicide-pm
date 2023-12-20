@@ -52,22 +52,22 @@ save data_winsorize_d1920, replace
 **********************************************************************************
 use data_winsorize_d1920, clear
 
-cap erase "table_main_wp_d1920.xls"
-cap erase "table_main_wp_d1920.txt"
+cap erase "$resdir/tables/table_resp_cardio_mortality.tex"
 
-foreach V of varlist d_rate_ad {
+loc outfile = "$resdir/tables/table_resp_cardio_mortality.tex"
 
-  ivreghdfe `V' $control2 (pm25=TINumD1), first absorb(i.dsp_code i.week) cluster(dsp_code week)
-  outreg2 using "table_main_wp_d1920.xls", ///
-  append ctitle(`V': 2SLS) dec(4) ///
-  keep(pm25) ///
+
+ ivreghdfe d_rate_ad $control2 (pm25=TINumD1), first absorb(i.dsp_code i.week) cluster(dsp_code week)
+  outreg2 using "`outfile'", tex(frag) label nor2 ///
+  replace ctitle(2SLS) dec(4) stats(coef se pval) ///
+  keep(pm25) nocons ///
   addstat(KP F-stat,e(widstat), p-value, e(idp), AR Chi2 p-value, e(archi2p), SW S-stat,e(sstatp)) ///
   addtext(County FE, Yes, Week FE, Yes, Clustering: County and week, Yes)
  
-  reghdfe `V' $control2 pm25, absorb(i.dsp_code i.week) cluster(dsp_code week)
-  outreg2 using "table_main_wp_d1920.xls", ///
-  append ctitle(`V': TWFE) dec(4) ///
+ reghdfe d_rate_ad $control2 pm25, absorb(i.dsp_code i.week) cluster(dsp_code week)
+  outreg2 using "`outfile'", tex(frag) label nor2 ///
+  append ctitle(TWFE) dec(4) stats(coef se pval)  nocons ///
   keep(pm25) ///
   addtext (County FE, Yes, Week FE, Yes, Clustering: County and week, Yes)
-}
+
 

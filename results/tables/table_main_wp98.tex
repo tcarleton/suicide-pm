@@ -1,9 +1,10 @@
 \begin{tabular}{lcccccc} \hline
  & (1) & (2) & (3) & (4) & (5) & (6) \\
-VARIABLES & d24\_rate: IV & d24\_rate: OLS & fd24\_rate: IV & fd24\_rate: OLS & md24\_rate: IV & md24\_rate: OLS \\ \hline
+VARIABLES & d24\_rate: 2SLS & d24\_rate: TWFE & fd24\_rate: 2SLS & fd24\_rate: TWFE & md24\_rate: 2SLS & md24\_rate: TWFE \\ \hline
  &  &  &  &  &  &  \\
 PM2.5 & 0.0079*** & 0.0001 & 0.0064** & 0.0003 & 0.0048 & 0.0000 \\
  & (0.0029) & (0.0002) & (0.0030) & (0.0002) & (0.0033) & (0.0003) \\
+ & 0.0064 & 0.4635 & 0.0311 & 0.1850 & 0.1441 & 0.9582 \\
  &  &  &  &  &  &  \\
 Observations & 139,196 & 139,240 & 139,105 & 139,148 & 139,187 & 139,230 \\
 County FE & X & X & X & X & X & X \\

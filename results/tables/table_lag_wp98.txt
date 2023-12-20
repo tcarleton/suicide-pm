@@ -3,24 +3,34 @@ VARIABLES	LABELS	d24_rate	d24_rate	d24_rate	d24_rate	d24_rate	d24_rate	d24_rate	
 											
 pm25_ave1	pm25_ave1	0.0097**									
 		(0.0045)									
+		0.0302									
 pm25_ave2	pm25_ave2		0.0118*								
 			(0.0065)								
+			0.0678								
 pm25_ave3	pm25_ave3			0.0153							
 				(0.0094)							
+				0.1045							
 pm25_ave4	pm25_ave4				0.0205						
 					(0.0136)						
+					0.1320						
 pm25_ave5	pm25_ave5					0.0227					
 						(0.0173)					
+						0.1891					
 pm25_ave6	pm25_ave6						0.0295				
 							(0.0238)				
+							0.2158				
 pm25_ave7	pm25_ave7							0.0362			
 								(0.0323)			
+								0.2630			
 pm25_ave8	pm25_ave8								0.0424		
 									(0.0414)		
+									0.3061		
 pm25_ave9	pm25_ave9									0.0460	
 										(0.0503)	
+										0.3611	
 pm25_ave10	pm25_ave10										0.0591
 											(0.0719)
+											0.4112
 											
 Observations		138,537	137,887	137,245	136,612	135,976	135,356	134,728	134,106	133,480	132,857
 County FE		X	X	X	X	X	X	X	X	X	X

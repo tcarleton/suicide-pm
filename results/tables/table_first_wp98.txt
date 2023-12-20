@@ -3,10 +3,13 @@ VARIABLES	LABELS	PM2.5	PM2.5	PM2.5
 				
 TINumD1	No. of inversions	0.513***		
 		(0.079)		
+		0.000		
 TIStrD1	Inversion strength ($^\circ)		1.509***	
 			(0.274)	
+			0.000	
 TIIndD1	No. days with inversion			0.754***
 				(0.130)
+				0.000
 				
 Observations		139,196	139,196	139,196
 R-squared		0.673	0.672	0.672
