@@ -353,7 +353,6 @@ foreach V of varlist d24_rate {
 **********************************************************************************
 
 use data_winsorize, clear
-loc pp = 98
 loc outfile = "$resdir/tables/table_weather_wp`pp'.tex"
 
 cap erase "$resdir/tables/table_weather_wp`pp'.tex"
@@ -429,7 +428,7 @@ foreach V of varlist d24_rate  {
 *						                                                         *
 * Robustness: Fixed effects                                 *
 **********************************************************************************
-loc pp = 98
+
 use data_winsorize, clear
 
 
@@ -533,7 +532,7 @@ foreach V of varlist d24_rate  {
 *						                                                         *
 * Dynamics: lagged air pollution                                  *
 **********************************************************************************
-loc pp = 98
+
 use data_winsorize, clear
 tsset dsp_code week
 
@@ -584,7 +583,7 @@ foreach i of numlist 1/10 {
 *						                                                         *
 * Dynamics: distributed lag model using reduced form
 **********************************************************************************
-loc pp = 98
+
 use data_winsorize, clear
 
 cap erase "$resdir/tables/table_lag_reduce_wp`pp'.tex"
@@ -648,7 +647,7 @@ foreach V of varlist d24_rate {
   local b=round(b,0.0001)
   local se=round(se,0.0001)
   local t=round(b/se, 0.0001)
- outreg2 using "`outfile'", label tex(frag)  nor2 ///
+ outreg2 using "`outfile'", label tex(frag)  nor2 stats(coef se pval)  ///
   append ctitle(`V') dec(4) ///
   keep (TINumD1*) nocons nonotes ///
   addtext (Cum. effect, `b', Cum. effect SE, `se', Cum. effect t-stat, `t')
@@ -736,7 +735,7 @@ foreach V of varlist d24_rate {
 *						                                                         *
 * Pollutants                        *
 **********************************************************************************
-loc pp = 98
+
 use data_winsorize, clear
 
 cap erase "$resdir/tables/table_pollutant_wp`pp'.tex"
@@ -767,7 +766,6 @@ addtext(County FE, X, Week-of-sample FE, X)
 * outlined by Lin and Wooldridge (2017). The original article can be found here: http://www.weilinmetrics.com/uploads/5/1/4/0/51404393/nonlinear_panel_cre_endog_20170309.pdf	
 * This statalist discussion also discusses implementation details: https://www.statalist.org/forums/forum/general-stata-discussion/general/1381373-ivpoisson-with-panel-data-fixed-effects		                        */   
 
-loc pp = 98
 
 use data_winsorize, clear
 
