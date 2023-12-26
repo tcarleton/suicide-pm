@@ -54,6 +54,8 @@ drop n
 sort county_id year month day
 collapse (mean) aqi-co (firstnm) year month day, by(county_id week)
 
+* save a version of the weekly data for public release (all other data are confidential)
+save "$datadir/pollution_county_weekly_for_release.dta", replace
 
 * generate county-specific time trends
 egen uniqueccode = group(county_id)
@@ -86,8 +88,6 @@ qui summ uniqueccode
 			di "No PM observations to run trend estimation with"
 			}
 		}
-
-* Added trend and constant in order to calculate alternative yhat_diff that avoids missing values
 
 * predicted value of pm2.5 
 gen pm25_hat= constant+(pm25_trend*week)
@@ -140,7 +140,6 @@ gen yhat_diff_ciHi = (_b[pm25]+1.96*_se[pm25]) *(pm25_hat_fw - pm25_hat)
 if "`test'" == "FALSE" {
 	save "$datadir/yhats_simulated.dta", replace
 }
-
 
 **********************************************************
 		* County-specific total change in suicide rate
